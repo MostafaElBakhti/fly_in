@@ -1,8 +1,10 @@
 with open("map.txt", "r") as f:
-    lines = f.readlines(20)
+    lines = f.readlines()
+
+    if not lines :
+            print("nothing to print")
 
 for line in lines:
     line = line.strip()
 
-    if not line:
-        continue
+    print(line)
