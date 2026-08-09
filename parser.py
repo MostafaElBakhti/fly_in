@@ -1,3 +1,14 @@
+class Map:
+
+    def __init__(self):
+        self.nb_drones = 0
+        self.start_hub = None
+        self.end_hub = None
+        self.zones = []
+        self.connections = []
+
+data = Map()
+
 with open("map.txt", "r") as f:
     lines = f.readlines()
 
@@ -14,11 +25,16 @@ for line in lines:
             print(f"key: {key} --- value:{value}")
             nb_drones = int(value.strip())
             print(nb_drones)
-        elif line.startswith("start_hub"):
+            data.nb_drones = nb_drones
+        elif line.startswith("start_hub:"):
+            ...
+        elif line.startswith("end_hub:"):
+            ...
+        elif line.startswith("hub:"):
             ...
 
     except:
         print("not found")
 
-
+print(data.nb_drones)
 # nb_drones: 5
