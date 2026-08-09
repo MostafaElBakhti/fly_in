@@ -1,12 +1,15 @@
 class Zone:
-    def __init__(self,name,x,y,zone_type,max_drones):
+    def __init__(self,name,x,y,metadata):
         self.name = name
         self.x = x
         self.y = y
-        self.zone_type = zone_type
+        self.metadata = metadata
+
+class Metadata:
+    def __init__(self,zone="normal", color="none", max_drones=1):
+        self.zone = zone
+        self.color = color 
         self.max_drones = max_drones
-
-
 
 class Connection:
 
@@ -24,10 +27,15 @@ class Drone:
         self.destination = destination
 
 
-zone_start = Zone("hub", 0, 0, "normal", 1)
-zone_end = Zone("hub", 10, 10, "normal", 1)
+meta = Metadata(zone="normal" , color="green" , max_drones=3)
+print(meta.max_drones)
+zone_start = Zone("hub", 0, 0, meta)
 
-connection = Connection(zone_start, zone_end, 2)
+print(zone_start.metadata.color)
 
-drone = Drone(1,zone_start,zone_end)
+# zone_end = Zone("hub", 10, 10, "normal", 1)
+
+# connection = Connection(zone_start, zone_end, 2)
+
+# drone = Drone(1,zone_start,zone_end)
 

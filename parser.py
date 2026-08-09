@@ -27,7 +27,18 @@ for line in lines:
             print(nb_drones)
             data.nb_drones = nb_drones
         elif line.startswith("start_hub:"):
-            ...
+            key, value = line.split(":", 1)
+            print('-------------')
+            value = value.strip()
+            # print(key , value)
+            main ,metadata = value.split("[")
+            main = main.strip()
+            name, x, y = main.split()
+            x = int(x)
+            y = int(y)
+            metadata = metadata.rstrip("]")
+            print('-------------')
+
         elif line.startswith("end_hub:"):
             ...
         elif line.startswith("hub:"):
