@@ -1,3 +1,5 @@
+from classes import Zone, ZoneMetadata
+
 class Map:
 
     def __init__(self):
@@ -31,12 +33,40 @@ for line in lines:
             print('-------------')
             value = value.strip()
             # print(key , value)
-            main ,metadata = value.split("[")
+            main ,zonemetadata = value.split("[")
             main = main.strip()
             name, x, y = main.split()
             x = int(x)
             y = int(y)
-            metadata = metadata.rstrip("]")
+
+
+            zonemetadata = zonemetadata.rstrip("]")
+            print(main)
+            print(zonemetadata)
+
+            parts = zonemetadata.split()
+            print(parts)
+
+
+            zone = "normal"
+            color = "none"
+            max_drones = 1
+
+            for part in parts:
+                key , value = part.split("=")
+                if key == "zone":
+                    zone = value
+                elif key == "color":
+                    color = value
+                elif key == "max_drones":
+                    max_drones = int(value)
+                print(key , value)
+            metadata = ZoneMetadata(zone, color, max_drones)
+            print('-------------')
+
+            print(metadata.__dict__)
+            print('-------------')
+
             print('-------------')
 
         elif line.startswith("end_hub:"):
