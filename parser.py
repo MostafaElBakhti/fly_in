@@ -61,7 +61,7 @@ def parse_zone(line):
 for line in lines:
     line = line.strip()
 
-    print(line)
+    # print(line)
     try:
 
 
@@ -84,7 +84,7 @@ for line in lines:
         elif line.startswith("connection:"):
             key, value = line.split(":", 1)
             value = value.strip()
-            print(key , value)
+            # print(key , value)
 
             max_link_capacity = 1
 
