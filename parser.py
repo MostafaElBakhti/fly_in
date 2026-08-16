@@ -8,6 +8,7 @@ class Map:
         self.end_hub = None
         self.zones = []
         self.connections = []
+        self.zone_by_name = {}
 
 data = Map()
 
@@ -56,6 +57,10 @@ def parse_zone(line):
 
     zone = Zone(name, x, y, metadata)
 
+    if name in data.zone_by_name:
+        raise ValueError(f"Duplicate zone name: {name}")
+
+    data.zone_by_name[name] = zone
     return zone
 
 for line in lines:
@@ -101,7 +106,15 @@ for line in lines:
             else:
                 main = value
 
-            zone_a, zone_b = main.split("-")
+            name_a, name_b = main.split("-")
+
+            if name_a not in data.zone_by_name:
+                raise ValueError(f"Connection references undefined zone: {name_a}")
+            if name_b not in data.zone_by_name:
+                raise ValueError(f"Connection references undefined zone: {name_b}")
+
+            zone_a = data.zone_by_name[name_a]
+            zone_b = data.zone_by_name[name_b]
 
             connection = Connection(zone_a, zone_b, max_link_capacity)
             data.connections.append(connection)
@@ -109,54 +122,6 @@ for line in lines:
             for test in data.connections:
                 print(test.__dict__)
 
-
-        # test = Map()
-
-        # elif line.startswith("start_hub:"):
-        #     key, value = line.split(":", 1)
-        #     print('-------------')
-        #     value = value.strip()
-        #     # print(key , value)
-        #     main ,zonemetadata = value.split("[")
-        #     main = main.strip()
-        #     name, x, y = main.split()
-        #     x = int(x)
-        #     y = int(y)
-
-
-        #     zonemetadata = zonemetadata.rstrip("]")
-        #     print(main)
-        #     print(zonemetadata)
-
-        #     parts = zonemetadata.split()
-        #     print(parts)
-
-
-        #     zone = "normal"
-        #     color = "none"
-        #     max_drones = 1
-
-        #     for part in parts:
-        #         key , value = part.split("=")
-        #         if key == "zone":
-        #             zone = value
-        #         elif key == "color":
-        #             color = value
-        #         elif key == "max_drones":
-        #             max_drones = int(value)
-        #         print(key , value)
-        #     metadata = ZoneMetadata(zone, color, max_drones)
-        #     print('-------------')
-
-        #     print(metadata.__dict__)
-        #     print('-------------')
-
-        #     print('-------------')
-
-        # elif line.startswith("end_hub:"):
-        #     ...
-        # elif line.startswith("hub:"):
-        #     ...
 
     except:
         print("not found")
