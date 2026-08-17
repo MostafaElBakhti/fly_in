@@ -18,6 +18,10 @@ with open("map.txt", "r") as f:
     if not lines :
             print("nothing to print")
 
+# def get_neighbors(data):
+#     for connection in data.connections:
+
+
 def parse_zone(line):
     value = line.split(":", 1)[1].strip()
 
@@ -119,12 +123,12 @@ for line in lines:
             connection = Connection(zone_a, zone_b, max_link_capacity)
             data.connections.append(connection)
 
-            for test in data.connections:
-                print(test.__dict__)
 
 
     except:
         print("not found")
 
+for test in data.connections:
+    print(test.zone_a.name, test.zone_b.name)
 print(data.nb_drones)
 # nb_drones: 5

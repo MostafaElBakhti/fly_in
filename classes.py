@@ -14,8 +14,8 @@ class ZoneMetadata:
 class Connection:
 
     def __init__(self, zone_a, zone_b, max_link_capacity=1):
-        self.zone_a = zone_a
-        self.zone_b = zone_b
+        self.zone_a = zone_a  #//object
+        self.zone_b = zone_b  #//object
         self.max_link_capacity = max_link_capacity
 
 
@@ -27,16 +27,14 @@ class Drone:
         self.current_zone = current_zone
         self.destination = destination
 
+# meta1 = ZoneMetadata("normal","green",2)
+# meta2 = ZoneMetadata("normal","green",2)
 
-# meta = Metadata(zone="normal" , color="green" , max_drones=3)
-# print(meta.max_drones)
-# zone_start = Zone("hub", 0, 0, meta)
+# zone1 = Zone("slak", 2,2,meta)
+# zone2 = Zone("ino", 2,2,meta)
 
-# print(zone_start.metadata.color)
+# connection = Connection(zone1,zone2,2)
 
-# zone_end = Zone("hub", 10, 10, "normal", 1)
+# print(connection.zone_a.name)
 
-# connection = Connection(zone_start, zone_end, 2)
-
-# drone = Drone(1,zone_start,zone_end)
 
