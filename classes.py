@@ -4,6 +4,7 @@ class Zone:
         self.x = x
         self.y = y
         self.metadata = metadata
+        self.neighbors = {}
 
 class ZoneMetadata:
     def __init__(self,zone="normal", color="none", max_drones=1):

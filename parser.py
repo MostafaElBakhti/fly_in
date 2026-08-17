@@ -10,6 +10,13 @@ class Map:
         self.connections = []
         self.zone_by_name = {}
 
+    def get_neighbors(self):
+        for connection in  self.connections:
+            zone_a = connection.zone_a
+            zone_b = connection.zone_b
+
+            
+
 data = Map()
 
 with open("map.txt", "r") as f:
@@ -20,6 +27,8 @@ with open("map.txt", "r") as f:
 
 # def get_neighbors(data):
 #     for connection in data.connections:
+
+
 
 
 def parse_zone(line):
