@@ -10,16 +10,19 @@ class Map:
         self.connections = []
         self.zone_by_name = {}
 
-    def get_neighbors(self):
+    def build_neighbors(self):
         for connection in  self.connections:
             zone_a = connection.zone_a
             zone_b = connection.zone_b
 
-            
+            zone_a.neighbors[zone_b] = connection
+            zone_b.neighbors[zone_a] = connection
+
+
 
 data = Map()
 
-with open("map.txt", "r") as f:
+with open("map1.txt", "r") as f:
     lines = f.readlines()
 
     if not lines :
@@ -129,6 +132,14 @@ for line in lines:
             zone_a = data.zone_by_name[name_a]
             zone_b = data.zone_by_name[name_b]
 
+            for connection in data.connections:
+                if (
+                    connection.zone_a == zone_a and connection.zone_b == zone_b
+                ) or (
+                    connection.zone_a == zone_b and connection.zone_b == zone_a
+                ):
+                    raise ValueError("Duplicate connection")
+
             connection = Connection(zone_a, zone_b, max_link_capacity)
             data.connections.append(connection)
 
@@ -137,7 +148,23 @@ for line in lines:
     except:
         print("not found")
 
-for test in data.connections:
-    print(test.zone_a.name, test.zone_b.name)
-print(data.nb_drones)
-# nb_drones: 5
+# for test in data.connections:
+#     print(test.zone_a.name, test.zone_b.name)
+# print(data.nb_drones)
+# # nb_drones: 5
+
+data.build_neighbors()
+print(data.zones[0].name)
+for test in data.zones[0].neighbors.keys():
+    print(test.name)
+
+print()
+
+# for zone in data.zone_by_name.values():
+#     print(f"\nZone: {zone.name}")
+
+#     for neighbor, connection in zone.neighbors.items():
+#         print(
+#             f"  neighbor: {neighbor.name} "
+#             f"| capacity: {connection.max_link_capacity}"
+#         )

@@ -1,0 +1,52 @@
+nb_drones: 3
+start_hub: start 0 0 [color=green]
+end_hub: end 10 10 [color=red]
+
+hub: A 2 2
+hub: B 4 2
+hub: C 2 5
+hub: D 6 5
+
+connection: start-A
+connection: start-C
+connection: A-B
+connection: C-D
+connection: B-end
+connection: D-end
+
+
+A = Zone("A", 2, 2, metadata)
+B = Zone("B", 4, 2, metadata)
+C = Zone("C", 2, 5, metadata)
+D = Zone("D", 6, 5, metadata)
+end_hub = Zone("end", 10, 10, metadata)
+
+
+connection1 = Connection(start, A, 1)   (zone_a, zone_b ) objects not names 
+connection2 = Connection(start, C, 1)
+connection3 = Connection(A, B, 1)
+connection4 = Connection(C, D, 1)
+connection5 = Connection(B, end, 1)
+connection6 = Connection(D, end, 1)
+
+data.connections = [
+    connection1,     
+    connection2,
+    connection3,
+    connection4,
+    connection5,
+    connection6
+]
+
+data.zone_by_name = {
+    "start": start_object,
+    "A": A_object,
+    "B": B_object,
+    "C": C_object,
+    "D": D_object,
+    "end": end_object
+}
+
+
+A.neighbors[C] = connection1
+C.neighbors[A] = connection1
