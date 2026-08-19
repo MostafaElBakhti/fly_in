@@ -18,7 +18,15 @@ class Map:
             zone_a.neighbors[zone_b] = connection
             zone_b.neighbors[zone_a] = connection
 
+    def dijkstra(self):
+        distances = {}
+        previous = {}
 
+        for zone in self.zone_by_name.values():
+            distances[zone] = float("inf")
+            print(zone.name , distances[zone])
+
+        distances[self.start_hub] = 0
 
 data = Map()
 
@@ -154,11 +162,7 @@ for line in lines:
 # # nb_drones: 5
 
 data.build_neighbors()
-print(data.zones[0].name)
-for test in data.zones[0].neighbors.keys():
-    print(test.name)
-
-print()
+data.dijkstra()
 
 # for zone in data.zone_by_name.values():
 #     print(f"\nZone: {zone.name}")
