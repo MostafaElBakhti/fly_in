@@ -18,39 +18,39 @@ class Map:
             zone_a.neighbors[zone_b] = connection
             zone_b.neighbors[zone_a] = connection
 
-    def dijkstra(self):
-
-        distances = {}
-        previous = {}
-
-        for zone in self.zone_by_name.values():
-            distances[zone] = float("inf")
-            revious[zone] = None
-
-        distances[self.start_hub] = 0
-        unvisited = set(self.zone_by_name.values())
-
-
-        while unvisited:
-
-            current = min(
-                unvisited,
-                key=lambda zone : (
-                    distances[zone],
-                    0 if zone.metadata.zone == "priority" else 1
-                )
-            )
-        
-        if distances[current] == float("inf"):
-            break
-
-        unvisited.remove(current)
-
-        if current == self.end_hub:
-            break
-
-
     # def dijkstra(self):
+
+    #     distances = {}
+    #     previous = {}
+
+    #     for zone in self.zone_by_name.values():
+    #         distances[zone] = float("inf")
+    #         revious[zone] = None
+
+    #     distances[self.start_hub] = 0
+    #     unvisited = set(self.zone_by_name.values())
+
+
+    #     while unvisited:
+
+    #         current = min(
+    #             unvisited,
+    #             key=lambda zone : (
+    #                 distances[zone],
+    #                 0 if zone.metadata.zone == "priority" else 1
+    #             )
+    #         )
+        
+    #     if distances[current] == float("inf"):
+    #         break
+
+    #     unvisited.remove(current)
+
+    #     if current == self.end_hub:
+    #         break
+
+
+    def dijkstra(self):
         distances = {}
         previous = {}
 
@@ -116,7 +116,7 @@ class Map:
 
 data = Map()
 
-with open("map1.txt", "r") as f:
+with open("map.txt", "r") as f:
     lines = f.readlines()
 
     if not lines :
@@ -248,8 +248,12 @@ for line in lines:
 # # nb_drones: 5
 
 data.build_neighbors()
-data.dijkstra()
+path = data.dijkstra()
 
+if path is None:
+    print("No path")
+else:
+    print(" -> ".join(zone.name for zone in path))
 # for zone in data.zone_by_name.values():
 #     print(f"\nZone: {zone.name}")
 
