@@ -19,6 +19,22 @@ class Map:
             zone_b.neighbors[zone_a] = connection
 
     def dijkstra(self):
+
+        distances = {}
+        previous = {}
+
+        for zone in self.zone_by_name.values():
+            distances[zone] = float("inf")
+            revious[zone] = None
+
+        distances[self.start_hub] = 0
+        unvisited = set(self.zone_by_name.values())
+
+
+        while unvisited:
+            
+
+    # def dijkstra(self):
         distances = {}
         previous = {}
 
