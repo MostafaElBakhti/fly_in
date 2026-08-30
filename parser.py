@@ -24,9 +24,63 @@ class Map:
 
         for zone in self.zone_by_name.values():
             distances[zone] = float("inf")
-            print(zone.name , distances[zone])
+            previous[zone] = None
 
         distances[self.start_hub] = 0
+
+        unvisited = set(self.zone_by_name.values())
+
+        while unvisited:
+
+            current = min(
+                unvisited,
+                key=lambda zone: (
+                    distances[zone],
+                    0 if zone.metadata.zone == "priority" else 1
+                )
+            )
+
+            if distances[current] == float("inf"):
+                break
+
+            unvisited.remove(current)
+
+            if current == self.end_hub:
+                break
+
+            for neighbor, connection in current.neighbors.items():
+
+                if neighbor.metadata.zone == "blocked":
+                    continue
+
+                if neighbor.metadata.zone == "restricted":
+                    cost = 2
+                else:
+                    cost = 1
+
+                new_distance = distances[current] + cost
+
+                if new_distance < distances[neighbor]:
+                    distances[neighbor] = new_distance
+                    previous[neighbor] = current
+
+                elif new_distance == distances[neighbor]:
+                    if neighbor.metadata.zone == "priority":
+                        previous[neighbor] = current
+
+        if distances[self.end_hub] == float("inf"):
+            return None
+
+        path = []
+        current = self.end_hub
+
+        while current is not None:
+            path.append(current)
+            current = previous[current]
+
+        path.reverse()
+
+        return path
 
 data = Map()
 
