@@ -32,7 +32,23 @@ class Map:
 
 
         while unvisited:
-            
+
+            current = min(
+                unvisited,
+                key=lambda zone : (
+                    distances[zone],
+                    0 if zone.metadata.zone == "priority" else 1
+                )
+            )
+        
+        if distances[current] == float("inf"):
+            break
+
+        unvisited.remove(current)
+
+        if current == self.end_hub:
+            break
+
 
     # def dijkstra(self):
         distances = {}
