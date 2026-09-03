@@ -60,7 +60,10 @@ class Map:
 
         distances[self.start_hub] = 0
 
-        unvisited = set(self.zone_by_name.values())
+        unvisited = set(
+            zone for zone in self.zone_by_name.values()
+            if zone.metadata.zone != "blocked"
+        )
 
         while unvisited:
 
@@ -82,8 +85,8 @@ class Map:
 
             for neighbor, connection in current.neighbors.items():
 
-                if neighbor.metadata.zone == "blocked":
-                    continue
+                # if neighbor.metadata.zone == "blocked":
+                #     continue
 
                 if neighbor.metadata.zone == "restricted":
                     cost = 2
