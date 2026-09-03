@@ -1,16 +1,14 @@
-nb_drones: 4
-start_hub: S 0 0
-end_hub: G 10 10
+nb_drones=2
 
-hub: A 1 1
-hub: B 2 2 [zone=blocked]
-hub: C 3 3
-hub: D 4 4
+start_hub=START 0 0
+end_hub=END 3 0
 
-connection: S-A
-connection: A-B
-connection: B-G
+hub=A 1 0
+hub=B 1 1
+hub=C 2 1
 
-connection: S-C
-connection: C-D
-connection: D-G
+connection=START-A
+connection=START-B
+connection=A-END
+connection=B-C
+connection=C-END
