@@ -2,12 +2,13 @@ from classes import Connection, Zone, ZoneMetadata
 from map import Map
 
 
-def parse_zone(line, data):
+def parse_zone(line, data, zone_name):
     value = line.split(":", 1)[1].strip()
+    zones = ["normal", "blocked", "restricted", "priority"]
     zone_type = "normal"
     color = "none"
     max_drones = 1
-
+    
     if "[" in value:
         main, zonemetadata = value.split("[", 1)
         main = main.strip()
@@ -23,10 +24,24 @@ def parse_zone(line, data):
                 max_drones = int(val)
     else:
         main = value
+        
+    zone_type = zone_type.lower()
+    if zone_type not in zones:
+        raise ValueError("invalid zone type")
 
     name, x, y = main.split()
+    if " " in name or "-" in name:
+        raise ValueError("Invalid zone name")
+    if zone_name == "hub:":
+        if max_drones < 0 :
+            raise ValueError("max_drones must be positive integers")
+    try:
+        x = int(x)
+        y = int(y)
+    except ValueError:
+        raise ValueError("enter a valid integer coordinates")
     metadata = ZoneMetadata(zone_type, color, max_drones)
-    zone = Zone(name, int(x), int(y), metadata)
+    zone = Zone(name, x, y, metadata)
 
     if name in data.zone_by_name:
         raise ValueError(f"Duplicate zone name: {name}")
@@ -35,7 +50,7 @@ def parse_zone(line, data):
     return zone
 
 
-def parse_connection(line, data):
+def parse_connection(line, data ):
     value = line.split(":", 1)[1].strip()
     max_link_capacity = 1
 
@@ -67,7 +82,7 @@ def parse_map_file(filename):
         line = line.strip()
         if not line or line.startswith("#"):
             continue
-
+        nm = ""
         if line.startswith("nb_drones:"):
             try:
                 nb = int(line.split(":", 1)[1].strip())
@@ -79,17 +94,29 @@ def parse_map_file(filename):
                 print(f"Invalid nb_drones: {er}")
 
         elif line.startswith("start_hub:"):
+            nm = "start_hub:"
             try:
-                data.start_hub = parse_zone(line, data)
+                data.start_hub = parse_zone(line, data , nm)
+                # data.start_hub.metadata.max_drones = data.nb_drones
                 
-                data.start_hub.metadata.max_drones = data.nb_drones
-                print(data.start_hub.metadata.max_drones)
+                # print(data.start_hub.metadata.max_drones)
             except ValueError as er :
                 print(er)
-        # elif line.startswith("end_hub:"):
-        #     data.end_hub = parse_zone(line, data)
-        # elif line.startswith("hub:"):
-        #     data.zones.append(parse_zone(line, data))
+        elif line.startswith("end_hub:"):
+            nm = "end_hub:"
+            try:
+                data.end_hub = parse_zone(line, data , nm)
+                # data.end_hub.metadata.max_drones = data.nb_drones
+
+                # print(data.end_hub.metadata.max_drones)
+            except ValueError as er:
+                print(er)
+        elif line.startswith("hub:"):
+            nm = "hub:"
+            try:
+                data.zones.append(parse_zone(line, data, nm))
+            except ValueError as er:
+                print(er)
         # elif line.startswith("connection:"):
         #     data.connections.append(parse_connection(line, data))
 
