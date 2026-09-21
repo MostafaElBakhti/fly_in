@@ -69,15 +69,29 @@ def parse_map_file(filename):
             continue
 
         if line.startswith("nb_drones:"):
-            data.nb_drones = int(line.split(":", 1)[1].strip())
+            try:
+                nb = int(line.split(":", 1)[1].strip())
+
+                if nb <= 0:
+                    raise ValueError( "nb_drones must be positive or more than 0" )
+                data.nb_drones = nb
+            except ValueError as er: 
+                print(f"Invalid nb_drones: {er}")
+
         elif line.startswith("start_hub:"):
-            data.start_hub = parse_zone(line, data)
-        elif line.startswith("end_hub:"):
-            data.end_hub = parse_zone(line, data)
-        elif line.startswith("hub:"):
-            data.zones.append(parse_zone(line, data))
-        elif line.startswith("connection:"):
-            data.connections.append(parse_connection(line, data))
+            try:
+                data.start_hub = parse_zone(line, data)
+                
+                data.start_hub.metadata.max_drones = data.nb_drones
+                print(data.start_hub.metadata.max_drones)
+            except ValueError as er :
+                print(er)
+        # elif line.startswith("end_hub:"):
+        #     data.end_hub = parse_zone(line, data)
+        # elif line.startswith("hub:"):
+        #     data.zones.append(parse_zone(line, data))
+        # elif line.startswith("connection:"):
+        #     data.connections.append(parse_connection(line, data))
 
     data.build_neighbors()
     return data

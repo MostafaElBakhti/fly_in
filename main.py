@@ -1,4 +1,4 @@
-from parser import parse_map_file
+from parser_1 import parse_map_file
 
 
 def main():
