@@ -121,8 +121,8 @@ def parse_map_file(filename):
             except ValueError as er:
                 print(er)
                 exit(0)
-        # elif line.startswith("connection:"):
-        #     data.connections.append(parse_connection(line, data))
+        elif line.startswith("connection:"):
+            data.connections.append(parse_connection(line, data))
 
     data.build_neighbors()
     return data
