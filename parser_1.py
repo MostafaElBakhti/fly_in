@@ -92,6 +92,7 @@ def parse_map_file(filename):
                 data.nb_drones = nb
             except ValueError as er: 
                 print(f"Invalid nb_drones: {er}")
+                exit(0)
 
         elif line.startswith("start_hub:"):
             nm = "start_hub:"
@@ -102,6 +103,7 @@ def parse_map_file(filename):
                 # print(data.start_hub.metadata.max_drones)
             except ValueError as er :
                 print(er)
+                exit(0)
         elif line.startswith("end_hub:"):
             nm = "end_hub:"
             try:
@@ -111,12 +113,14 @@ def parse_map_file(filename):
                 # print(data.end_hub.metadata.max_drones)
             except ValueError as er:
                 print(er)
+                exit(0)
         elif line.startswith("hub:"):
             nm = "hub:"
             try:
                 data.zones.append(parse_zone(line, data, nm))
             except ValueError as er:
                 print(er)
+                exit(0)
         # elif line.startswith("connection:"):
         #     data.connections.append(parse_connection(line, data))
 
