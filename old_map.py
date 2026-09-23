@@ -1,4 +1,5 @@
 class Map:
+    """Holds the zone/connection graph and finds paths through it."""
 
     def __init__(self):
         self.nb_drones = 0
@@ -16,6 +17,18 @@ class Map:
             zone_a.neighbors[zone_b] = connection
             zone_b.neighbors[zone_a] = connection
 
+    def path_cost(self, path):
+        cost = 0
+        for zone in path[1:]:
+            cost += 2 if zone.metadata.zone == "restricted" else 1
+        return cost
+
+    def path_priority(self, path):
+        score = 0
+        for zone in path:
+            if zone.metadata.zone == "priority":
+                score += 1
+        return score
 
     def dijkstra(
         self,
@@ -64,9 +77,6 @@ class Map:
                 break
 
             for neighbor, connection in current.neighbors.items():
-                if neighbor not in unvisited:
-                    continue
-                
                 if (
                     connection in forbidden_connections
                     or neighbor in forbidden_nodes
@@ -102,6 +112,59 @@ class Map:
         path.reverse()
         return path
 
+    def find_all_paths(self, max_paths=5):
+        first_path = self.dijkstra()
+        if first_path is None:
+            return []
 
-        def find_alternative_paths(self, max_paths=10):
-            ...
+        paths = [first_path]
+        candidates = []
+
+        while len(paths) < max_paths:
+            previous_path = paths[-1]
+
+            for i in range(len(previous_path) - 1):
+                spur_node = previous_path[i]
+                root_path = previous_path[: i + 1]
+
+                forbidden_nodes = set(root_path[:-1])
+                forbidden_connections = set()
+
+                for path in paths:
+                    if len(path) > i and path[: i + 1] == root_path:
+                        zone_a = path[i]
+                        zone_b = path[i + 1]
+                        connection = zone_a.neighbors.get(zone_b)
+                        if connection:
+                            forbidden_connections.add(connection)
+
+                spur_path = self.dijkstra(
+                    start=spur_node,
+                    end=self.end_hub,
+                    forbidden_connections=forbidden_connections,
+                    forbidden_nodes=forbidden_nodes,
+                )
+
+                if spur_path is None:
+                    continue
+
+                total_path = root_path[:-1] + spur_path
+
+                if total_path not in paths and total_path not in candidates:
+                    candidates.append(total_path)
+
+            if not candidates:
+                break
+
+            best_path = min(
+                candidates,
+                key=lambda path: (
+                    self.path_cost(path),
+                    -self.path_priority(path),
+                ),
+            )
+
+            candidates.remove(best_path)
+            paths.append(best_path)
+
+        return paths

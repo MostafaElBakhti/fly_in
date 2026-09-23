@@ -1,4 +1,4 @@
-import sys 
+import sys
 from classes import Connection, Zone, ZoneMetadata
 from map import Map
 
@@ -199,7 +199,7 @@ def parse_map_file(filename: str) -> Map:
             else:
                 raise ValueError("unknown definition")
         except ValueError as error:
-            print(f"Error: line {line_number}: {error}", file=sys.stderr) 
+            print(f"Error: line {line_number}: {error}", file=sys.stderr)
             sys.exit(1)
 
     if first_definition:
