@@ -1,3 +1,4 @@
+import sys 
 from classes import Connection, Zone, ZoneMetadata
 from map import Map
 
@@ -15,6 +16,9 @@ def parse_metadata(value: str) -> tuple[str, dict[str, str]]:
         raise ValueError("metadata must be at the end of the line")
 
     main, metadata_text = value[:-1].split("[", 1)
+    if not metadata_text.strip():
+        raise ValueError("empty metadata block")
+
     main = main.strip()
     metadata = {}
 
@@ -149,7 +153,7 @@ def parse_map_file(filename: str) -> Map:
         with open(filename, "r") as file:
             lines = file.readlines()
     except (OSError, UnicodeError) as error:
-        raise ValueError(f"cannot read map file: {error}")
+        sys.exit(f"Error: cannot read map file: {error}")
 
     for line_number, raw_line in enumerate(lines, start=1):
         line = raw_line.split("#", 1)[0].strip()
@@ -186,21 +190,26 @@ def parse_map_file(filename: str) -> Map:
                 data.zones.append(parse_zone(line, data, "hub:"))
 
             elif line.startswith("connection:"):
+                if not found_start:
+                    raise ValueError("missing start_hub definition")
+                if not found_end:
+                    raise ValueError("missing end_hub definition")
                 data.connections.append(parse_connection(line, data))
 
             else:
                 raise ValueError("unknown definition")
         except ValueError as error:
-            raise ValueError(f"line {line_number}: {error}") from None
+            print(f"Error: line {line_number}: {error}", file=sys.stderr) 
+            sys.exit(1)
 
     if first_definition:
-        raise ValueError("line 1: map file is empty")
+        sys.exit("line 1: map file is empty")
     if not found_start:
-        raise ValueError(
+        sys.exit(
             f"line {len(lines) + 1}: missing start_hub definition"
         )
     if not found_end:
-        raise ValueError(
+        sys.exit(
             f"line {len(lines) + 1}: missing end_hub definition"
         )
 
