@@ -1,4 +1,5 @@
 class Map:
+    """Holds the zone/connection graph and finds paths through it."""
 
     def __init__(self):
         self.nb_drones = 0
@@ -76,9 +77,6 @@ class Map:
                 break
 
             for neighbor, connection in current.neighbors.items():
-                if neighbor not in unvisited:
-                    continue
-                
                 if (
                     connection in forbidden_connections
                     or neighbor in forbidden_nodes
@@ -114,8 +112,6 @@ class Map:
         path.reverse()
         return path
 
-
-
     def find_all_paths(self, max_paths=5):
         first_path = self.dijkstra()
         if first_path is None:
@@ -127,21 +123,21 @@ class Map:
         while len(paths) < max_paths:
             previous_path = paths[-1]
 
-            for i in range(len(previous_path) - 1): #3
+            for i in range(len(previous_path) - 1):
                 spur_node = previous_path[i]
-                root_path = previous_path[:i + 1]
+                root_path = previous_path[: i + 1]
 
                 forbidden_nodes = set(root_path[:-1])
                 forbidden_connections = set()
 
                 for path in paths:
-                    if len(path) > i + 1 and path[:i + 1] == root_path:
-                        zone_a = path[i] #S
-                        zone_b = path[i + 1] #C
+                    if len(path) > i and path[: i + 1] == root_path:
+                        zone_a = path[i]
+                        zone_b = path[i + 1]
                         connection = zone_a.neighbors.get(zone_b)
                         if connection:
                             forbidden_connections.add(connection)
-                        # forbidden_connections = {connection_S_C}
+
                 spur_path = self.dijkstra(
                     start=spur_node,
                     end=self.end_hub,
