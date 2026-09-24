@@ -113,6 +113,8 @@ def parse_connection(line: str, data: Map) -> Connection:
         raise ValueError("connection must use the format <zone1>-<zone2>")
 
     name_a, name_b = main.split("-", 1)
+    if name_a == name_b:
+        raise ValueError("connection cannot be connected to itself")
     if not valid_zone_name(name_a) or not valid_zone_name(name_b):
         raise ValueError("connection contains an invalid zone name")
     if name_a not in data.zone_by_name:

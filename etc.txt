@@ -1,0 +1,75 @@
+
+
+# [S → C → D → G]
+
+       A ------------─── B
+      /                    \
+    S                       G
+      \                    /
+       C ──────────────── D
+
+       E (blocked, isolated)
+            
+
+paths = [[S, C, D, G]]
+
+i = 0
+spur_node = S
+root_path = [S]
+
+forbidden_nodes = set()
+forbidden_connections = set()
+
+# forbidden_connections = {connection_S_C}
+
+spur_path = [S, A, B, G]
+total_path = [] + [S, A, B, G]
+
+candidates = [
+    [S, A, B, G]
+]
+
+i = 1
+
+spur_node = C
+root_path = [S, C]
+forbidden_nodes = {S}
+
+forbidden_connections = set()
+
+forbidden_connections = {connection_C_D}
+
+
+paths = [
+    [S, C, D, G],
+    [S, A, B, G]
+]
+
+
+previous_path = [S, A, B, G]
+
+spur_node = S
+root_path = [S]
+
+forbidden_nodes = set()
+forbidden_connections = set()
+
+forbidden_connections = {connection_S_C, connection_S_A}
+
+i = 1
+
+spur_node = A
+root_path = [S, A]
+
+forbidden_nodes = {S}
+forbidden_connections = set()
+
+
+forbidden_connections = {connection_A_B}
+
+spur_node = A
+root_path = [S, A]
+
+forbidden_nodes = {S}
+forbidden_connections = {connection_A_B}
+
