@@ -65,7 +65,11 @@ class Map:
         while unvisited:
             current = min(
                 unvisited,
-                key=lambda zone: (distances[zone], -priority_score[zone]),
+                key=lambda zone: (
+                    distances[zone],
+                    -priority_score[zone],
+                    zone.name,
+                ),
             )
 
             if distances[current] == float("inf"):
@@ -161,6 +165,7 @@ class Map:
                 key=lambda path: (
                     self.path_cost(path),
                     -self.path_priority(path),
+                    tuple(zone.name for zone in path),
                 ),
             )
 
