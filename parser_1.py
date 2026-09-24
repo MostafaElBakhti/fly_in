@@ -36,12 +36,15 @@ def parse_metadata(value: str) -> tuple[str, dict[str, str]]:
 
 
 def positive_integer(value: str, field_name: str) -> int:
+    if "_" in value:
+        raise ValueError(f"{field_name} must be a positive integer")
     try:
         number = int(value)
     except ValueError:
         raise ValueError(
             f"{field_name} must be a positive integer"
         ) from None
+
 
     if number <= 0:
         raise ValueError(f"{field_name} must be a positive integer")
