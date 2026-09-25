@@ -169,6 +169,7 @@ class Map:
             )
 
             candidates.remove(best_path)
+            print(f"best path founded : {best_path}")
             paths.append(best_path)
 
         return paths
