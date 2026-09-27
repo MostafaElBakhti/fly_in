@@ -86,4 +86,37 @@ class Simulator:
 
                 drone.position += 1
                 drone.current_zone = next_zone
-                
+                drone.transit_turns = 0
+                drone.pending_zone = None
+                drone.pending_connection = None
+                moves_this_turn.append(f"{drone.name} - {next_zone.name}")
+
+                if next_zone == self.map_data.end_hub:
+                    drone.finished = True
+
+                # Phase 2
+            
+            decided = moved_this_turn
+            progress = True
+
+            while progress:
+                progress = False
+
+                for drone in self.drones:
+                    if (
+                        drone.finished
+                        or drone.transit_turns != 0
+                        or drone in decided
+                    ):
+                        continue
+
+                    if drone.position + 1 >= len(drone.path):
+                        continue
+
+                    next_zone = drone.path[drone.position + 1]
+                    curr_zone = drone.current_zone
+                    connection = curr_zone.neighbors[next_zone]
+
+                    used = link_usage[connection]
+                    if used >= connection.max_link_capacity:
+                        continue
