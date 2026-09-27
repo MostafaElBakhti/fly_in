@@ -86,3 +86,4 @@ class Simulator:
 
                 drone.position += 1
                 drone.current_zone = next_zone
+                
