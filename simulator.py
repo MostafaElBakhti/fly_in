@@ -120,3 +120,19 @@ class Simulator:
                     used = link_usage[connection]
                     if used >= connection.max_link_capacity:
                         continue
+
+                    is_hub = next_zone in (
+                        self.map_data.start_hub,
+                        self.map_data.end_hub,
+                    )
+                    occ = len(zone_occupancy[next_zone]) + len(
+                        zone_reservations[next_zone]
+                    )
+                    if not (is_hub or occ < next_zone.metadata.max_drones):
+                        continue
+
+
+                    zone_occupancy[curr_zone].remove(drone)
+                    link_usage[connection] += 1
+                    decided.add(drone)
+                    progress = True
