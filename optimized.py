@@ -2,7 +2,7 @@ from map import Map
 from classes import Drone, Zone
 
 
-class DeadlockError(ValueError):
+class DeadlockError(Exception):
     """Raised when no drone can make further progress."""
     pass
 
