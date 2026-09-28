@@ -136,3 +136,41 @@ class Simulator:
                     link_usage[connection] += 1
                     decided.add(drone)
                     progress = True
+
+                    if next_zone.metadata.zone == "restricted":
+                        drone.transit_turns = 1
+                        drone.pending_zone = next_zone
+                        drone.pending_connection = connection
+                        zone_reservations[next_zone].append(drone)
+                        connection_transit[connection] += 1
+                        moves_this_turn.append(
+                            f"{drone.name}-{curr_zone.name}-{next_zone.name}"
+                        )
+                    else:
+                        drone.position += 1
+                        drone.curr_zone = next_zone
+                        zone_occupancy[next_zone].append(drone)
+                        moves_this_turn.append(
+                            f"{drone.name}-{next_zone.name}"
+                        )
+
+                        if next_zone == self.map_data.end_hub:
+                            drone.finished = True
+            if not moves_this_turn:
+                raise DeadlockError(
+                    f"No drone can move on turn {turn}; assigned routes block."
+                )
+            if emit_output:
+                print(" ".join(moves_this_turn))
+
+            self.record_snapshot(turn=turn)
+            turn += 1
+
+    def record_snapshot(self, turn: int) -> None:
+        snapshot: Snapshot = {
+            "turn": turn,
+            "positions": {
+                drone.name: drone.current_zone for drone in self.drones
+            },
+        }
+        self.history.append(snapshot)
