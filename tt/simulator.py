@@ -24,7 +24,6 @@ class Simulator:
 
         self.history = []
 
-
     def assign_paths(self) -> None:
         if not self.paths:
             raise ValueError("No valid paths found for assignment.")
@@ -88,7 +87,6 @@ class Simulator:
             raise DeadlockError(
                 "No candidate route set can deliver all drones."
             )
-
         self.paths = best_paths
 
     # ============================================================
@@ -98,7 +96,8 @@ class Simulator:
     def run(self) -> None:
         self._select_paths()
         self.assign_paths()
-        self._simulate()
+        final_turn = self._simulate()
+        print(f"Final turns: {final_turn}")
 
     # ============================================================
     # SIMULATION
@@ -159,7 +158,7 @@ class Simulator:
         # ========================================================
         # MAIN LOOP
         # ========================================================
-
+        
         while finished_count < len(self.drones):
 
             moves_this_turn = []
