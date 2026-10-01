@@ -1,0 +1,88 @@
+Fly_in Dijkstra Example
+========================
+
+Purpose
+-------
+This file saves the example map and the final path selected by the current Dijkstra implementation.
+Upload this file later to continue the step-by-step explanation from the same example.
+
+Map
+---
+nb_drones: 10
+
+start_hub: START 0 3 [color=green]
+end_hub: END 12 3 [color=yellow]
+
+hub: A 2 1 [zone=normal color=blue max_drones=2]
+hub: B 2 5 [zone=priority color=orange max_drones=1]
+hub: C 5 1 [zone=restricted color=red max_drones=1]
+hub: D 5 5 [zone=normal color=cyan max_drones=2]
+hub: E 8 1 [zone=normal color=purple max_drones=2]
+hub: F 8 5 [zone=priority color=pink max_drones=1]
+hub: X 6 3 [zone=blocked color=gray max_drones=1]
+
+connection: START-A [max_link_capacity=2]
+connection: START-B [max_link_capacity=1]
+
+connection: A-C [max_link_capacity=1]
+connection: A-D [max_link_capacity=1]
+connection: B-C [max_link_capacity=1]
+connection: B-D [max_link_capacity=2]
+
+connection: C-E [max_link_capacity=1]
+connection: D-E [max_link_capacity=1]
+connection: D-F [max_link_capacity=1]
+
+connection: E-END [max_link_capacity=2]
+connection: F-END [max_link_capacity=2]
+
+connection: C-X
+connection: X-F
+
+
+Current Dijkstra Rules
+----------------------
+- Blocked zones are excluded.
+- Entering a restricted zone costs 2.
+- Entering any other usable zone costs 1.
+- Entering a priority zone adds +1 to priority_score.
+- The next current zone is chosen using:
+    (distance, -priority_score, zone.name)
+- On equal distance, the route with the higher priority_score is preferred.
+- Already visited nodes are skipped with:
+    if neighbor not in unvisited:
+        continue
+
+
+Final Best Path
+---------------
+[START, B, D, F, END]
+
+Total cost:
+START -> B = 1
+B -> D     = 1
+D -> F     = 1
+F -> END   = 1
+
+Total cost = 4
+
+Priority score:
+B = priority -> +1
+F = priority -> +1
+
+Total priority score = 2
+
+
+Final previous-chain
+--------------------
+previous[END] = F
+previous[F]   = D
+previous[D]   = B
+previous[B]   = START
+previous[START] = None
+
+Backward reconstruction:
+END -> F -> D -> B -> START
+
+After path.reverse():
+START -> B -> D -> F -> END

@@ -81,6 +81,10 @@ class Map:
                 break
 
             for neighbor, connection in current.neighbors.items():
+                
+                if neighbor not in unvisited:
+                    continue  
+
                 if (
                     connection in forbidden_connections
                     or neighbor in forbidden_nodes
