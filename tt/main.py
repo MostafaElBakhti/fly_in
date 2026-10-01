@@ -11,7 +11,7 @@
 
 from parser import parse_map_file
 from simulator import Simulator
-from visualizer import InteractiveVisualizer
+# from visualizer import InteractiveVisualizer
 
 
 def main():
@@ -21,8 +21,8 @@ def main():
     sim = Simulator(data, paths)
     sim.run()
 
-    visualizer = InteractiveVisualizer(data, sim.history)
-    visualizer.show()
+    # visualizer = InteractiveVisualizer(data, sim.history)
+    # visualizer.show()
 
 
 if __name__ == "__main__":

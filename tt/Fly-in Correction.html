@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fly-in Correction</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-secondary: #596b7e;
+            --primary: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --border: #e1e4e8;
+            --shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding-bottom: 100px;
+        }
+
+        /* Header */
+        header {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h1 { margin: 0; font-size: 1.6rem; color: var(--text-main); }
+        .project-meta { color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px; }
+        
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover { background-color: #2980b9; }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: white; }
+
+        /* Info Cards */
+        .info-card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary);
+        }
+        .info-card h3 { margin-top: 0; margin-bottom: 12px; font-size: 1.2rem; }
+        .info-card p, .info-card li { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 8px; }
+        .info-card ul { padding-left: 20px; margin-top: 8px; }
+
+        /* Sections */
+        .criteria-section {
+            background: var(--card-bg);
+            border-radius: 8px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .section-header {
+            background: #f8f9fa;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+
+        .criteria-item {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+        .criteria-item:last-child { border-bottom: none; }
+
+        .criteria-content { flex: 1; }
+        .criteria-title { font-weight: 600; display: block; margin-bottom: 8px; font-size: 1.05rem; }
+        .criteria-desc { font-size: 0.95rem; color: var(--text-secondary); white-space: pre-line; }
+
+        /* Voting Buttons */
+        .vote-controls {
+            display: flex;
+            gap: 8px;
+            min-width: 140px;
+            flex-shrink: 0;
+        }
+
+        .vote-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border);
+            background: white;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .vote-btn.yes:hover, .vote-btn.yes.active {
+            background-color: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .vote-btn.no:hover, .vote-btn.no.active {
+            background-color: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        /* Flags Section */
+        .flags-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            padding: 24px;
+        }
+        
+        .flag-label {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+            color: var(--text-main);
+        }
+        .flag-label input { margin-right: 8px; accent-color: var(--primary); }
+
+        /* Footer Actions */
+        .footer-actions {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255,255,255,0.95);
+            padding: 16px 24px;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            backdrop-filter: blur(8px);
+            z-index: 100;
+        }
+
+        .footer-content {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        textarea {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+            min-height: 60px;
+        }
+        textarea:focus { outline: 2px solid var(--primary); border-color: transparent; }
+
+        .attachments {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+    <header>
+        <div>
+            <h1>Fly-in</h1>
+            <div class="project-meta">Scale for project</div>
+        </div>
+        <div class="attachments">
+            <a href="https://cdn.intra.42.fr/pdf/pdf/204746/en.subject.pdf" target="_blank" class="btn btn-outline">subject.pdf</a>
+            <a href="https://cdn.intra.42.fr/document/document/49241/maps.tar.gz" target="_blank" class="btn btn-outline">maps.tar.gz</a>
+        </div>
+    </header>
+
+    <!-- Introduction -->
+    <div class="info-card">
+        <h3>Introduction</h3>
+        <p>- Remain polite, courteous, respectful and constructivethroughout the evaluation process. The well-being of the communitydepends on it.</p>
+        <p>- Identify with the person (or the group) evaluated the eventualdysfunctions of the work. Take the time to discussand debate the problems you have identified.</p>
+        <p>- You must consider that there might be some difference in how yourpeers might have understood the project's instructions and thescope of its functionalities. Always keep an open mind and gradehim/her as honestly as possible. The pedagogy is valid only andonly if peer-evaluation is conducted seriously.</p>
+    </div>
+
+    <!-- Guidelines -->
+    <div class="info-card">
+        <h3>Guidelines</h3>
+        <ul>
+            <li>Only grade the work that is in the student or group's GiT repository.</li>
+            <li>Double-check that the GiT repository belongs to the student or the group. Ensure that the work is for the relevant project and also check that "git clone" is used in an empty folder.</li>
+            <li>Check carefully that no malicious aliases was used to fool you and make you evaluate something other than the content of the official repository.</li>
+            <li>To avoid any surprises, carefully check that both the evaluating and the evaluated students have reviewed the possible scripts used to facilitate the grading.</li>
+            <li>If the evaluating student has not completed that particular project yet, it is mandatory for this student to read the entire subject prior to starting the defence.</li>
+            <li>Use the flags available on this scale to signal an empty repository, non-functioning program, a norm error, cheating etc. In these cases, the grading is over and the final grade is 0 (or -42 in case of cheating). However, with the exception of cheating, you are encouraged to continue to discuss your work (even if you have not finished it) in order to identify any issues that may have caused this failure and avoid repeating the same mistake in the future.</li>
+            <li>Remember that for the duration of the defence, no segfault, no other unexpected, premature, uncontrolled or unexpected termination of the program, else the final grade is 0. Use the appropriate flag. You should never have to edit any file except the configuration file if it exists. If you want to edit a file, take the time to explicit the reasons with the evaluated student and make sure both of you are okay with this.</li>
+            <li>You must also verify the absence of memory leaks. Any memory allocated on the heap must be properly freed before the end of execution. You are allowed to use any of the different tools available on the computer, such as leaks, valgrind, or e_fence. In case of memory leaks, tick the appropriate flag.</li>
+        </ul>
+    </div>
+
+    <!-- Preliminaries -->
+    <div class="criteria-section">
+        <div class="section-header">Preliminaries</div>
+        
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Basics</span>
+                <span class="criteria-desc">The review is done in the presence of the graded learner(s). This
+is how everyone progresses: by interacting with others.
+The learner(s) must be present during the defense.
+If the learner is not present, the review cannot proceed.
+As soon as a core functionality is non-functional, the review stops.
+You can look at the code of the following sections, but they will not
+be graded.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Work submission</span>
+                <span class="criteria-desc">Only grade the work that is in the learner's or group's
+Git repository. Check that only the requested files are available
+in the git repository. If not, the evaluation stops here.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- README.md -->
+    <div class="criteria-section">
+        <div class="section-header">README.md</div>
+        
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">README.md file</span>
+                <span class="criteria-desc">Does the repository contain a README.md file at its root, and does it include all of the following?
+A "Description" section explaining the project's purpose and providing a brief overview.
+An "Instructions" section with details about how to run the project.
+An "Algorithm explanation" section describing the pathfinding approach and design decisions.
+Documentation of visual representation features and how they enhance user experience.
+Example input and expected output demonstrating the program's functionality.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Structure and Requirements -->
+    <div class="criteria-section">
+        <div class="section-header">Project Structure and Requirements</div>
+        
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">OOP</span>
+                <span class="criteria-desc">The project is completely object-oriented with proper class design
+and follows Python OOP best practices. Check for proper class separation,
+encapsulation, and inheritance where appropriate.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Type safe</span>
+                <span class="criteria-desc">The project is completely typesafe and passes mypy type checking without errors.
+Run 'mypy .' in the project directory to verify. If mypy is not installed,
+check that type hints are present throughout the codebase.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Graph implementation</span>
+                <span class="criteria-desc">The graph implementation is custom-built without using forbidden libraries
+(such as networkx, graphlib, etc.). The learner should be able to explain how it works.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Parser Implementation -->
+    <div class="criteria-section">
+        <div class="section-header">Parser Implementation</div>
+        
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Input files</span>
+                <span class="criteria-desc">Test the parser with valid input files. The parser correctly handles the new input file format including:
+Number of drones using "nb_drones: <number>" format
+Zone definitions with type prefixes (start_hub:, end_hub:, hub:)
+Connection definitions using "connection: <zone1>-<zone2>" format
+Optional metadata with defaults (zone=normal, max_drones=1)
+Connection metadata with max_link_capacity=1 default
+Comments starting with '#' are ignored
+At least 4 out of 5 format requirements should work correctly.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Error handling</span>
+                <span class="criteria-desc">Test error handling in the parser. The parser correctly handles errors:
+Test with malformed files (missing drone count, invalid format)
+Test with invalid zone types (should reject with clear error messages)
+Test with missing start_hub or end_hub definitions
+Test with invalid capacity values (non-positive integers)
+Test with duplicate zone names or connections
+At least 4 out of 5 error cases should be handled correctly with clear error messages.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zone and Movements Mechanics -->
+    <div class="criteria-section">
+        <div class="section-header">Zone and Movements Mechanics</div>
+        
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Zone occupancy rules</span>
+                <span class="criteria-desc">Test zone occupancy rules with capacity constraints:
+Zones respect max_drones capacity (default 1)
+Drones cannot enter zones that would exceed capacity
+Multiple drones can share start and end zones
+Capacity constraints are properly enforced during simulation
+Create test cases to verify these rules are enforced.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Movement costs</span>
+                <span class="criteria-desc">Test movement costs based on zone types:
+normal zones: 1 turn (default)
+restricted zones: 2 turns
+priority zones: 1 turn (but preferred in pathfinding)
+blocked zones: inaccessible
+Verify the simulation respects these movement costs in the output.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Connection capacity</span>
+                <span class="criteria-desc">Test connection capacity constraints:
+Connections respect max_link_capacity defined in connection metadata (default 1)
+Multiple drones can traverse high-capacity connections simultaneously
+Connection capacity limits are enforced during movement
+Verify capacity constraints work correctly in simulation.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visual Representation -->
+    <div class="criteria-section">
+        <div class="section-header">Visual Representation</div>
+        
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Visualization features</span>
+                <span class="criteria-desc">Test visual representation features:
+The program provides a clear visual feedback (colored terminal output and/or graphical interface)
+Colors specified in zone metadata are used for visualization
+Visual representation enhances understanding of the simulation
+The visual system clearly shows drone positions and movements
+The implementation should demonstrate meaningful visual feedback.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Basic Functionality Tests -->
+    <div class="criteria-section">
+        <div class="section-header">Basic Functionality Tests</div>
+        
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Simple scenarios</span>
+                <span class="criteria-desc">Test with simple scenarios:
+    - Test with single drone on a linear path
+    - Test with multiple drones using different paths
+    - Test with provided example maps from attachments/
+    - Verify output format: each line represents one turn, format "D<ID>-<zone>" or "D<ID>-<connection>"
+    - Verify stationary drones are omitted from output
+At least 4 out of 5 basic tests should pass successfully.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Simulation ends correctly</span>
+                <span class="criteria-desc">Test that the simulation ends correctly when all drones reach the end zone.
+The program should stop producing output once all drones have arrived.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pathfinding Algorithm -->
+    <div class="criteria-section">
+        <div class="section-header">Pathfinding Algorithm</div>
+        
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Valid path</span>
+                <span class="criteria-desc">The pathfinding algorithm successfully finds valid paths from
+start to end zone for various test cases. Test with:
+Simple linear maps
+Maps with multiple possible paths
+Maps with bottlenecks and capacity constraints
+Maps using different zone types
+The algorithm should find valid solutions for most test cases.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Conflict resolution</span>
+                <span class="criteria-desc">Test conflict resolution and capacity management:
+Test scenarios where drones compete for limited capacity
+Verify the algorithm handles multiple drones simultaneously
+Check that capacity constraints prevent conflicts
+Test turn-based movement with multi-turn zones (restricted)
+The algorithm should demonstrate proper capacity-aware conflict resolution.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance and Optimization -->
+    <div class="criteria-section">
+        <div class="section-header">Performance and Optimization</div>
+        
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Efficiency</span>
+                <span class="criteria-desc">Test with more complex scenarios to evaluate performance:
+Test with higher drone counts (10+ drones)
+Test with complex map topologies and capacity constraints
+Verify the solution minimizes total simulation turns
+Test performance with large graphs
+Note: This is not a failing requirement but should show reasonable performance.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Algorithm explanation</span>
+                <span class="criteria-desc">The learner can explain their algorithm complexity, design decisions,
+and trade-offs made in their implementation. They should be able to
+discuss their pathfinding approach, capacity management, and optimization strategies.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Benchmarks -->
+    <div class="criteria-section">
+        <div class="section-header">Performance Benchmarks</div>
+        
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Easy maps</span>
+                <span class="criteria-desc">Test performance against reference benchmarks using provided maps:
+Does the algorithm solve the Easy maps in less than 10 turns on average?
+Reference targets (for information only):
+Linear path (2 drones): ≤ 6 turns
+Simple fork (4 drones): ≤ 8 turns
+Basic capacity (4 drones): ≤ 6 turns
+These reference values are provided as optimization goals to help learners evaluate
+and tune their algorithms.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Medium maps</span>
+                <span class="criteria-desc">Test performance against reference benchmarks using provided maps:
+Does the algorithm solve the Medium maps in 10–30 turns on average?
+Reference targets (for information only):
+    - Dead end trap (5 drones): ≤ 12 turns
+    - Circular loop (6 drones): ≤ 15 turns
+    - Priority puzzle (5 drones): ≤ 12 turns
+  These reference values are provided as optimization goals to help learners evaluate
+  and tune their algorithms.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Hard maps</span>
+                <span class="criteria-desc">Test performance against reference benchmarks using provided maps:
+Does the algorithm solve the Hard maps in less than 60 turns on average?
+Reference targets (for information only):
+Maze nightmare (8 drones): ≤ 30 turns
+Capacity hell (12 drones): ≤ 35 turns
+Ultimate challenge (15 drones): ≤ 45 turns
+These reference values are provided as optimization goals to help learners evaluate
+and tune their algorithms.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edge Cases and Error Handling -->
+    <div class="criteria-section">
+        <div class="section-header">Edge Cases and Error Handling</div>
+        
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Edge cases</span>
+                <span class="criteria-desc">Test edge cases:
+Single drone scenarios
+Maps with bottlenecks or limited capacity
+Disconnected graphs (should handle gracefully)
+Invalid connections between zones
+Zero or very high capacity values
+At least 4 out of 5 edge cases should be handled correctly.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Error handling</span>
+                <span class="criteria-desc">The program provides appropriate error handling for invalid inputs:
+Malformed files with new format requirements
+Missing start_hub or end_hub zones
+Invalid capacity values
+Disconnected graphs
+Invalid zone types or connections
+Error messages should be clear and informative.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Code Quality and Documentation -->
+    <div class="criteria-section">
+        <div class="section-header">Code Quality and Documentation</div>
+        
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Code quality</span>
+                <span class="criteria-desc">Code quality assessment:
+Code is well-structured and readable
+Proper use of object-oriented principles
+Appropriate comments and documentation
+Consistent coding style
+Visual representation code is well-integrated
+Note: This is not a failing requirement but contributes to overall quality.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Quick Live Coding modifications</span>
+                <span class="criteria-desc">Live coding
+Please ask the reviewee to add a simple modification to their drone simulation program.
+Ask them to add a "--capacity-info" flag that displays capacity information during simulation,
+such as "Zone X: Y/Z drones, Connection A-B: Y/Z capacity used" for each turn.
+For example, "./main.py --capacity-info map.txt" should output the normal simulation plus
+capacity usage information. The reviewee should be able to locate the relevant
+parsing and output code, make the necessary modifications, and demonstrate that it works
+with a test case. The entire task, including the demonstration, should take no more
+than 10 minutes. Was this procedure followed and did everything work correctly?</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bonus Features -->
+    <div class="criteria-section">
+        <div class="section-header">Bonus Features</div>
+        
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Exceptional Performance</span>
+                <span class="criteria-desc">The Performance 'perfectly' meets the performance reference targets for all provided maps. 
+'Perfectly' meaning the algorithm meets exactly or outperforms the number of turns specified 
+in the reference targets for each map category. 
+  Targets are: Easy maps : 
+      - Linear path (2 drones): ≤ 6 turns 
+      - Simple fork (4 drones): ≤ 8 turns 
+      - Basic capacity (4 drones): ≤ 6 turns Medium maps : 
+      - Dead end trap (5 drones): ≤ 12 turns 
+      - Circular loop (6 drones): ≤ 15 turns 
+      - Priority puzzle (5 drones): ≤ 12 turns Hard maps : 
+      - Maze nightmare (8 drones): ≤ 30 turns 
+      - Capacity hell (12 drones): ≤ 35 turns 
+      - Ultimate challenge (15 drones): ≤ 45 turns</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+
+        <div class="criteria-item">
+            <div class="criteria-content">
+                <span class="criteria-title">Challenger Map</span>
+                <span class="criteria-desc">The Impossible Dream map is solved and beats the reference record of 45 turns.</span>
+            </div>
+            <div class="vote-controls">
+                <button class="vote-btn yes">Yes</button>
+                <button class="vote-btn no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ratings -->
+    <div class="criteria-section">
+        <div class="section-header">Ratings</div>
+        <div style="padding: 24px;">
+            <p style="margin-top: 0; font-weight: 500;">Don’t forget to check the flag corresponding to the defense</p>
+            <div class="flags-grid">
+                <label class="flag-label"><input type="radio" name="rating" value="Ok"> Ok</label>
+                <label class="flag-label"><input type="radio" name="rating" value="Outstanding project"> Outstanding project</label>
+                <label class="flag-label"><input type="radio" name="rating" value="Empty work"> Empty work</label>
+                <label class="flag-label"><input type="radio" name="rating" value="Incomplete work"> Incomplete work</label>
+                <label class="flag-label"><input type="radio" name="rating" value="Invalid compilation"> Invalid compilation</label>
+                <label class="flag-label"><input type="radio" name="rating" value="Norme"> Norme</label>
+                <label class="flag-label"><input type="radio" name="rating" value="Cheat"> Cheat</label>
+                <label class="flag-label"><input type="radio" name="rating" value="Crash"> Crash</label>
+                <label class="flag-label"><input type="radio" name="rating" value="Incomplete group"> Incomplete group</label>
+                <label class="flag-label"><input type="radio" name="rating" value="Concerning situation"> Concerning situation</label>
+                <label class="flag-label"><input type="radio" name="rating" value="Leaks"> Leaks</label>
+                <label class="flag-label"><input type="radio" name="rating" value="Forbidden function"> Forbidden function</label>
+                <label class="flag-label"><input type="radio" name="rating" value="Can’t support / explain code"> Can’t support / explain code</label>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Footer Actions -->
+<div class="footer-actions">
+    <div class="footer-content">
+        <div style="flex: 1;">
+            <div style="font-weight: 600; margin-bottom: 8px; font-size: 0.95rem;">Conclusion</div>
+            <textarea placeholder="Leave a comment on this evaluation ( 2048 chars max )"></textarea>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px; justify-content: flex-end;">
+            <button class="btn" style="background-color: var(--success);">Send</button>
+            <button class="btn btn-outline">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.vote-controls').forEach(control => {
+        const buttons = control.querySelectorAll('.vote-btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -24,9 +24,6 @@ class Simulator:
 
         self.history = []
 
-    # ============================================================
-    # ASSIGN PATHS
-    # ============================================================
 
     def assign_paths(self) -> None:
         if not self.paths:
