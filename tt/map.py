@@ -81,7 +81,7 @@ class Map:
                 break
 
             for neighbor, connection in current.neighbors.items():
-                
+
                 if neighbor not in unvisited:
                     continue  
 
@@ -132,8 +132,8 @@ class Map:
             previous_path = paths[-1]
 
             for i in range(len(previous_path) - 1):
-                spur_node = previous_path[i]
-                root_path = previous_path[: i + 1]
+                branch_node = previous_path[i]
+                root_path = previous_path[:i+1]
 
                 forbidden_nodes = set(root_path[:-1])
                 forbidden_connections = set()
@@ -147,7 +147,7 @@ class Map:
                             forbidden_connections.add(connection)
 
                 spur_path = self.dijkstra(
-                    start=spur_node,
+                    start=branch_node,
                     end=self.end_hub,
                     forbidden_connections=forbidden_connections,
                     forbidden_nodes=forbidden_nodes,
