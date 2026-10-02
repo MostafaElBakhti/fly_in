@@ -56,6 +56,9 @@ class Simulator:
         best_turns = float("inf")
         for count in range(1, len(self.paths) + 1):
             candidate_paths = self.paths[:count]
+            # candidate_paths = [
+            #     [START, B, D, F, END]
+            # ]
             trial = Simulator(self.map_data, candidate_paths)
             trial.assign_paths()
             try:

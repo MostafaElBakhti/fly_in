@@ -1,0 +1,19 @@
+TRIAL simulator:
+
+paths = P1 only
+drones = new temporary D1...D10
+
+self.paths = [
+    [START, B, D, F, END]
+]
+
+path_counts = [0]
+path_costs = [4]
+
+best_idx = 0
+D1 → P1
+path_counts = [1]
+D2 → P1
+
+in the end : 
+path_counts = [10]
