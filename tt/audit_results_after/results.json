@@ -1,0 +1,122 @@
+[
+  {
+    "map": "challenger/01_the_impossible_dream.txt",
+    "turns": 43,
+    "optimum": 43,
+    "within_25_percent": true,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": true,
+    "extra_stdout": [],
+    "repeatable_in_3_processes": true,
+    "stderr_summary_valid": true
+  },
+  {
+    "map": "easy/01_linear_path.txt",
+    "turns": 4,
+    "optimum": 4,
+    "within_25_percent": true,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": true,
+    "extra_stdout": [],
+    "repeatable_in_3_processes": true,
+    "stderr_summary_valid": true
+  },
+  {
+    "map": "easy/02_simple_fork.txt",
+    "turns": 4,
+    "optimum": 4,
+    "within_25_percent": true,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": true,
+    "extra_stdout": [],
+    "repeatable_in_3_processes": true,
+    "stderr_summary_valid": true
+  },
+  {
+    "map": "easy/03_basic_capacity.txt",
+    "turns": 4,
+    "optimum": 4,
+    "within_25_percent": true,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": true,
+    "extra_stdout": [],
+    "repeatable_in_3_processes": true,
+    "stderr_summary_valid": true
+  },
+  {
+    "map": "hard/01_maze_nightmare.txt",
+    "turns": 13,
+    "optimum": 13,
+    "within_25_percent": true,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": true,
+    "extra_stdout": [],
+    "repeatable_in_3_processes": true,
+    "stderr_summary_valid": true
+  },
+  {
+    "map": "hard/02_capacity_hell.txt",
+    "turns": 16,
+    "optimum": 16,
+    "within_25_percent": true,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": true,
+    "extra_stdout": [],
+    "repeatable_in_3_processes": true,
+    "stderr_summary_valid": true
+  },
+  {
+    "map": "hard/03_ultimate_challenge.txt",
+    "turns": 26,
+    "optimum": 26,
+    "within_25_percent": true,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": true,
+    "extra_stdout": [],
+    "repeatable_in_3_processes": true,
+    "stderr_summary_valid": true
+  },
+  {
+    "map": "medium/01_dead_end_trap.txt",
+    "turns": 8,
+    "optimum": 8,
+    "within_25_percent": true,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": true,
+    "extra_stdout": [],
+    "repeatable_in_3_processes": true,
+    "stderr_summary_valid": true
+  },
+  {
+    "map": "medium/02_circular_loop.txt",
+    "turns": 10,
+    "optimum": 10,
+    "within_25_percent": true,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": true,
+    "extra_stdout": [],
+    "repeatable_in_3_processes": true,
+    "stderr_summary_valid": true
+  },
+  {
+    "map": "medium/03_priority_puzzle.txt",
+    "turns": 6,
+    "optimum": 6,
+    "within_25_percent": true,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": true,
+    "extra_stdout": [],
+    "repeatable_in_3_processes": true,
+    "stderr_summary_valid": true
+  }
+]

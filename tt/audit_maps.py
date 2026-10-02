@@ -4,6 +4,7 @@ Run: python3 audit_maps.py
 Results, raw stdout, and extracted movement traces go into audit_results/.
 """
 import json
+import argparse
 import re
 import subprocess
 import sys
@@ -111,21 +112,15 @@ def validate(data, lines):
 
 
 def run_map(filename):
-    # Exercise main() itself, selecting its input without changing map.txt.
-    code = (
-        "import sys, main\n"
-        "from parser import parse_map_file\n"
-        "main.parse_map_file = lambda _: parse_map_file(sys.argv[1])\n"
-        "main.main()\n"
-    )
+    # Exercise the public CLI without changing map.txt.
     return subprocess.run(
-        [sys.executable, "-c", code, str(filename)], cwd=ROOT,
+        [sys.executable, str(ROOT / "main.py"), str(filename)], cwd=ROOT,
         capture_output=True, text=True, timeout=30,
     )
 
 
-def main():
-    folder = ROOT / "audit_results"
+def main(output_dir="audit_results"):
+    folder = ROOT / output_dir
     folder.mkdir(exist_ok=True)
     results = []
     filenames = sorted((ROOT / "maps").rglob("*.txt"))
@@ -141,12 +136,19 @@ def main():
             else:
                 extra.append({"line": number, "text": line})
         errors = validate(parse_map_file(filename), lines)
-        if run.returncode or run.stderr:
+        if run.returncode:
             errors.append(f"exit={run.returncode}; stderr={run.stderr.strip()}")
+        summary_valid = run.stderr == f"Final turns: {len(lines)}\n"
+        if not summary_valid:
+            errors.append(f"unexpected diagnostic output: {run.stderr!r}")
         repeated = [run_map(filename) for _ in range(2)]
-        repeatable = all(r.stdout == run.stdout and r.returncode == run.returncode for r in repeated)
+        repeatable = all(
+            (r.stdout, r.stderr, r.returncode)
+            == (run.stdout, run.stderr, run.returncode) for r in repeated
+        )
         stem = name.replace("/", "__").removesuffix(".txt")
         (folder / f"{stem}.stdout.txt").write_text(run.stdout)
+        (folder / f"{stem}.stderr.txt").write_text(run.stderr)
         (folder / f"{stem}.moves.txt").write_text("\n".join(lines) + "\n")
         result = {
             "map": name, "turns": len(lines), "optimum": TARGETS[name],
@@ -154,37 +156,37 @@ def main():
             "movement_valid": not errors, "errors": errors,
             "stdout_format_valid": not extra and not errors,
             "extra_stdout": extra, "repeatable_in_3_processes": repeatable,
+            "stderr_summary_valid": summary_valid,
         }
         results.append(result)
         print(f"{name}: {len(lines)}/{TARGETS[name]} turns; movement={'PASS' if not errors else 'FAIL'}; stdout={'PASS' if result['stdout_format_valid'] else 'FAIL'}; repeatable={repeatable}")
     (folder / "results.json").write_text(json.dumps(results, indent=2) + "\n")
     report = [
         "# Current-code audit against new_subject.pdf (version 2.0)", "",
-        "Production Python files were not changed. Each map was run through main() in three fresh processes, overriding only its input filename. Raw stdout and extracted movement-only logs are saved beside this report.", "",
+        "Each map was run through the public main.py CLI in three fresh processes. This audit does not modify solver files. Raw stdout, stderr diagnostics, and movement-only logs are saved beside this report.", "",
         "Benchmarks are from subject VII.6 (printed pages 16–17), not the outdated thresholds in test_simulator.py or maps/README.md. Missing an optimum is an optimization result, not a correctness failure.", "",
         "| Map | Turns | Subject optimum | Within +25% | Movement replay | Raw stdout | Repeatable* |",
         "|---|---:|---:|---|---|---|---|",
     ]
     for r in results:
         yes = lambda value: "Yes" if value else "No"
-        report.append(f"| {r['map']} | {r['turns']} | {r['optimum']} | {yes(r['within_25_percent'])} | {'Pass' if r['movement_valid'] else 'Fail'} | {'Pass' if r['stdout_format_valid'] else 'Fail'} | {yes(r['repeatable_in_3_processes'])} |")
+        stem = r['map'].replace('/', '__').removesuffix('.txt')
+        report.append(f"| [{r['map']}]({stem}.stdout.txt) | {r['turns']} | {r['optimum']} | {yes(r['within_25_percent'])} | {'Pass' if r['movement_valid'] else 'Fail'} | {'Pass' if r['stdout_format_valid'] else 'Fail'} | {yes(r['repeatable_in_3_processes'])} |")
     report += ["", "*Exact stdout equality in three runs is a sample check, not proof of determinism.", "",
         "## Findings", "",
         "- All movement-only logs are independently replayed: valid adjacent edges, blocked zones excluded, one action per drone per turn, immediate arrival on the next turn after restricted travel, shared undirected link capacity, simultaneous end-of-turn zone capacity, and delivery of every drone.",
-        "- Every raw stdout log includes a path-list debug line from map.py and a `Final turns:` summary from simulator.py. These are not movement lines and do not conform to VII.5; they are excluded only for the independent replay, retained in raw logs.",
-        "- VII.3 explicitly frees a restricted link on the arrival turn. The simulator copies connection_transit into link_usage before processing arrivals and does not decrement link_usage on arrival. This adds waiting and explains a missed optimization opportunity, without making the supplied movement traces illegal.",
-        "- The simulator reserves restricted destination capacity during transit. The subject describes availability after departures, so this conservative reservation can prevent pipelining even when next-turn arrival would be feasible.",
-        "- Existing unittest run: five test methods, 13 failing cases. Most fail on the extra `Final turns:` stdout line. After that is removed, tests also expect simulator.history snapshots, but the current simulator never records any. Restricted-link tests enforce the older rule (arrival still consumes link capacity), contradicting the current PDF.",
-        "- Restricted arrivals iterate an unordered set of Drone objects. Output token order can vary between fresh processes; compare the repeatability column. Order does not invalidate a simultaneous movement line.",
-        "- main.py always selects map.txt; passing a map filename on the command line currently does not select it. The audit overrides its parser input to exercise every supplied map without overwriting map.txt.",
-        "- Confirmed unsolvable-map defect: a valid disconnected map containing only start and end causes `find_all_paths()` to raise `TypeError: 'NoneType' object is not iterable`, because the debug print iterates first_path before checking for None. This violates VII.4 graceful unsolvable-map handling.",
-        "- A two-drone route through a restricted zone of capacity 2 and a capacity-1 incoming link takes 5 turns in the current simulator. The subject permits a valid 4-turn trace: start D1; arrive D1/start D2; finish D1/arrive D2; finish D2. This isolates the unnecessarily retained arrival-turn link usage.",
-        "- flake8 and mypy are not installed in this environment, so their mandatory checks were not run. No root Makefile or root README.md was present. main.py has its visualizer import and calls commented out; simulator.history is empty, and its terminal movement output is uncolored. The website currently visualizes pathfinding rather than moving drones, so required visual simulation feedback is not established.",
+        "- stdout is checked for movement lines only; stderr must contain exactly the matching final-turn summary. See each map's .stderr.txt file.",
+        "- The independent replay follows current VII.3: an arrival frees its restricted link for another departure in the same turn.",
+        "- The simulator plans each turn on copied drones and previews the next turn before committing. This permits restricted pipelining while checking mandatory arrival capacity. Unsafe departures or head-on conflicts are retried with more waiting; a checked conservative preview is retained as fallback.",
+        "- Token ordering is deterministic by drone ID; the audit compares stdout, stderr, and exit codes across three fresh processes per map.",
+        "- Full change details and before/after comparisons are in ../CHANGES_AND_RESULTS.md.",
         "", "## Scope", "",
-        "This audit validates the supplied maps, not all possible graphs or mathematical global optimality. The subject's published optimum is the benchmark. Full submission compliance additionally requires type/lint checks, Makefile, root README, graceful unsolvable-map handling, and visual simulation feedback.",
+        "This audit validates the supplied maps, not all possible graphs or global optimality. The subject's published optimum is the benchmark. Full submission compliance additionally requires type/lint checks, Makefile, root README, and visual simulation feedback.",
     ]
     (folder / "REPORT.md").write_text("\n".join(report) + "\n")
 
 
 if __name__ == "__main__":
-    main()
+    arguments = argparse.ArgumentParser(description=__doc__)
+    arguments.add_argument("--output-dir", default="audit_results")
+    main(arguments.parse_args().output_dir)
