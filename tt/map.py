@@ -122,7 +122,6 @@ class Map:
 
     def find_all_paths(self, max_paths=5):
         first_path = self.dijkstra()
-        print( [zone.name for zone in first_path] )
         if first_path is None:
             return []
 

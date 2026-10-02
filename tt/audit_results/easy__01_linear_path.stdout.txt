@@ -1,0 +1,6 @@
+['start', 'waypoint1', 'waypoint2', 'goal']
+D1-waypoint1
+D1-waypoint2 D2-waypoint1
+D1-goal D2-waypoint2
+D2-goal
+Final turns: 4

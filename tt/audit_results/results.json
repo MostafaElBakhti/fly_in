@@ -1,0 +1,202 @@
+[
+  {
+    "map": "challenger/01_the_impossible_dream.txt",
+    "turns": 43,
+    "optimum": 43,
+    "within_25_percent": true,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": false,
+    "extra_stdout": [
+      {
+        "line": 1,
+        "text": "['start', 'gate_hell1', 'maze_trap_a1', 'maze_trap_a2', 'micro_gate1', 'overflow_hell1', 'conv_restricted1', 'conv_restricted2', 'conv_restricted3', 'final_merge', 'final_torture1', 'final_torture2', 'final_torture3', 'final_torture4', 'final_torture5', 'impossible_goal']"
+      },
+      {
+        "line": 45,
+        "text": "Final turns: 43"
+      }
+    ],
+    "repeatable_in_3_processes": false
+  },
+  {
+    "map": "easy/01_linear_path.txt",
+    "turns": 4,
+    "optimum": 4,
+    "within_25_percent": true,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": false,
+    "extra_stdout": [
+      {
+        "line": 1,
+        "text": "['start', 'waypoint1', 'waypoint2', 'goal']"
+      },
+      {
+        "line": 6,
+        "text": "Final turns: 4"
+      }
+    ],
+    "repeatable_in_3_processes": true
+  },
+  {
+    "map": "easy/02_simple_fork.txt",
+    "turns": 4,
+    "optimum": 4,
+    "within_25_percent": true,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": false,
+    "extra_stdout": [
+      {
+        "line": 1,
+        "text": "['start', 'junction', 'path_a', 'goal']"
+      },
+      {
+        "line": 6,
+        "text": "Final turns: 4"
+      }
+    ],
+    "repeatable_in_3_processes": true
+  },
+  {
+    "map": "easy/03_basic_capacity.txt",
+    "turns": 4,
+    "optimum": 4,
+    "within_25_percent": true,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": false,
+    "extra_stdout": [
+      {
+        "line": 1,
+        "text": "['start', 'bottleneck', 'wide_area', 'goal']"
+      },
+      {
+        "line": 6,
+        "text": "Final turns: 4"
+      }
+    ],
+    "repeatable_in_3_processes": true
+  },
+  {
+    "map": "hard/01_maze_nightmare.txt",
+    "turns": 13,
+    "optimum": 13,
+    "within_25_percent": true,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": false,
+    "extra_stdout": [
+      {
+        "line": 1,
+        "text": "['start', 'maze_a1', 'maze_a2', 'maze_c2', 'bottleneck', 'final_stretch1', 'goal']"
+      },
+      {
+        "line": 15,
+        "text": "Final turns: 13"
+      }
+    ],
+    "repeatable_in_3_processes": true
+  },
+  {
+    "map": "hard/02_capacity_hell.txt",
+    "turns": 16,
+    "optimum": 16,
+    "within_25_percent": true,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": false,
+    "extra_stdout": [
+      {
+        "line": 1,
+        "text": "['start', 'gate3', 'waiting_area3', 'convergence', 'final_bottleneck', 'goal']"
+      },
+      {
+        "line": 18,
+        "text": "Final turns: 16"
+      }
+    ],
+    "repeatable_in_3_processes": true
+  },
+  {
+    "map": "hard/03_ultimate_challenge.txt",
+    "turns": 26,
+    "optimum": 26,
+    "within_25_percent": true,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": false,
+    "extra_stdout": [
+      {
+        "line": 1,
+        "text": "['start', 'dist_gate1', 'maze_correct', 'bottleneck1', 'bottleneck2', 'priority_hub', 'conv_priority1', 'conv_priority2', 'final_merge', 'final_gate1', 'final_gate2', 'final_gate3', 'goal']"
+      },
+      {
+        "line": 28,
+        "text": "Final turns: 26"
+      }
+    ],
+    "repeatable_in_3_processes": true
+  },
+  {
+    "map": "medium/01_dead_end_trap.txt",
+    "turns": 8,
+    "optimum": 8,
+    "within_25_percent": true,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": false,
+    "extra_stdout": [
+      {
+        "line": 1,
+        "text": "['start', 'junction', 'correct_path', 'intermediate', 'goal']"
+      },
+      {
+        "line": 10,
+        "text": "Final turns: 8"
+      }
+    ],
+    "repeatable_in_3_processes": true
+  },
+  {
+    "map": "medium/02_circular_loop.txt",
+    "turns": 15,
+    "optimum": 10,
+    "within_25_percent": false,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": false,
+    "extra_stdout": [
+      {
+        "line": 1,
+        "text": "['start', 'loop_a', 'loop_b', 'exit_point', 'goal']"
+      },
+      {
+        "line": 17,
+        "text": "Final turns: 15"
+      }
+    ],
+    "repeatable_in_3_processes": true
+  },
+  {
+    "map": "medium/03_priority_puzzle.txt",
+    "turns": 7,
+    "optimum": 6,
+    "within_25_percent": true,
+    "movement_valid": true,
+    "errors": [],
+    "stdout_format_valid": false,
+    "extra_stdout": [
+      {
+        "line": 1,
+        "text": "['start', 'fast_junction', 'fast_path', 'merge_point', 'goal']"
+      },
+      {
+        "line": 9,
+        "text": "Final turns: 7"
+      }
+    ],
+    "repeatable_in_3_processes": true
+  }
+]
