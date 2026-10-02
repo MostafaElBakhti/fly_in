@@ -126,16 +126,24 @@ class Map:
             return []
 
         paths = [first_path]
+        # paths = [
+        #     [START, B, D, F, END],
+        #     [START, A, D, F, END], 
+        # ] in the second search
         candidates = []
 
         while len(paths) < max_paths:
             previous_path = paths[-1]
+            # BEST path is [START, B, D, F, END]
+            for i in range(len(previous_path) - 1): # i=2 # i=3
+                branch_node = previous_path[i] # start # B #D #F
+                root_path = previous_path[:i+1] # [start] # [start, B] # [start, B, D], # [start, B, D , F]
 
-            for i in range(len(previous_path) - 1):
-                branch_node = previous_path[i] # start # B
-                root_path = previous_path[:i+1] # [start] # [start, B]
-
-                forbidden_nodes = set(root_path[:-1]) # [] # forbidden_nodes = {START}
+                forbidden_nodes = set(root_path[:-1]) 
+                # [] 
+                # forbidden_nodes = {START} 
+                # forbidden_nodes = {START, B}
+                # forbidden_nodes = {START, B, D}
                 forbidden_connections = set()
 
                 for path in paths:
@@ -161,12 +169,14 @@ class Map:
                 total_path = root_path[:-1] + branch_path
                 #total_path = [] + [START, A, D, F, END] 
                 #total_path = [START] + [B, C, E, END]
+                #total_path = [START , B] + [D, E, END]
 
                 if total_path not in paths and total_path not in candidates:
                     candidates.append(total_path)
                 # candidates = [
                 #     [START, A, D, F, END],
-                #     [START, B, C, E, END]
+                #     [START, B, C, E, END],
+                #     [START, B, D, E, END]
                 # ]
             if not candidates:
                 break
@@ -182,5 +192,6 @@ class Map:
 
             candidates.remove(best_path)
             paths.append(best_path)
-
+        for path in paths:
+            print([zone.name for zone in path])
         return paths

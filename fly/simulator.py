@@ -8,20 +8,27 @@ from map import Map
 
 
 class DeadlockError(Exception):
-    """Raised when assigned routes cannot be scheduled."""
+    pass
 
 
 class Simulator:
-    """Route drones with a two-phase turn loop and safe restricted arrivals."""
 
     def __init__(self, map_data: Map, paths: list[list[Zone]]) -> None:
         self.map_data = map_data
         self.paths = paths
+        # self.paths = [
+        #     P1, P2, P3, P4, P5
+        # ]
+        # P1 = START → B → D → F → END
+        # P2 = START → A → D → F → END
+        # P3 = START → B → D → E → END
+        # P4 = START → A → D → E → END
+        # P5 = START → B → C → E → END
         self.drones = [
             Drone(i + 1, map_data.start_hub, map_data.end_hub)
             for i in range(map_data.nb_drones)
-        ]
-        self.history = []
+        ] # D1 D2 D3 D4 D5 D6 D7 D8 D9 D10
+        self.history: list[dict[str, tuple[float, float]]] = []
         self.turns = 0
 
     def assign_paths(self) -> None:
@@ -59,16 +66,31 @@ class Simulator:
                 best_turns = turns
                 best_paths = candidate_paths
         if best_paths is None:
-            raise DeadlockError("No candidate route set can deliver all drones.")
+            raise DeadlockError(
+                "No candidate route set can deliver all drones."
+            )
         self.paths = best_paths
 
     def run(self) -> int:
         """Print only movement turns on stdout; return the total turn count."""
         self._select_paths()
         self.assign_paths()
+        self.history.clear()
+        self.save_turn()
         self.turns = self._simulate()
         print(f"Final turns: {self.turns}", file=sys.stderr)
         return self.turns
+
+    def save_turn(self) -> None:
+        """Save drone coordinates; in-flight drones use link midpoints."""
+        positions: dict[str, tuple[float, float]] = {}
+        for drone in self.drones:
+            x, y = float(drone.current_zone.x), float(drone.current_zone.y)
+            if drone.pending_zone is not None:
+                x = (x + drone.pending_zone.x) / 2
+                y = (y + drone.pending_zone.y) / 2
+            positions[drone.name] = (x, y)
+        self.history.append(positions)
 
     def _plan_turn(
         self, current_drones: list[Drone], allow_pipeline: bool,
@@ -77,7 +99,7 @@ class Simulator:
         """Try one turn on copies, keeping the real drones unchanged.
 
         Pipeline mode permits a restricted departure into an occupied zone;
-        _simulate accepts it only after checking next turn's mandatory arrivals.
+        _simulate accepts it after checking next turn's mandatory arrivals.
         Conservative mode reserves an empty destination slot immediately.
         """
         drones = [copy(drone) for drone in current_drones]
@@ -156,7 +178,9 @@ class Simulator:
                     drone.position += 1
                     drone.current_zone = next_zone
                     drone.finished = next_zone is end_hub
-                    moves_this_turn[drone.id] = f"{drone.name}-{next_zone.name}"
+                    moves_this_turn[drone.id] = (
+                        f"{drone.name}-{next_zone.name}"
+                    )
 
         # Mandatory arrivals can temporarily fill a zone before departures.
         # Only a complete turn with valid final occupancy may be committed.
@@ -215,7 +239,9 @@ class Simulator:
                 # conservative reservation rule when there is no saved plan.
                 planned = guaranteed_next_turn
                 if planned is None:
-                    planned = self._plan_turn(self.drones, allow_pipeline=False)
+                    planned = self._plan_turn(
+                        self.drones, allow_pipeline=False,
+                    )
                 if planned is not None:
                     preview = self._plan_turn(planned[0], allow_pipeline=False)
             if planned is None or preview is None or not planned[1]:
@@ -233,5 +259,6 @@ class Simulator:
             guaranteed_next_turn = preview
             if emit_output:
                 print(" ".join(moves_this_turn))
+                self.save_turn()
             turn += 1
         return turn - 1
