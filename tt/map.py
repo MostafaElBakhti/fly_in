@@ -132,35 +132,42 @@ class Map:
             previous_path = paths[-1]
 
             for i in range(len(previous_path) - 1):
-                branch_node = previous_path[i]
-                root_path = previous_path[:i+1]
+                branch_node = previous_path[i] # start # B
+                root_path = previous_path[:i+1] # [start] # [start, B]
 
-                forbidden_nodes = set(root_path[:-1])
+                forbidden_nodes = set(root_path[:-1]) # [] # forbidden_nodes = {START}
                 forbidden_connections = set()
 
                 for path in paths:
-                    if len(path) > i and path[: i + 1] == root_path:
-                        zone_a = path[i]
-                        zone_b = path[i + 1]
+                    if len(path) > i + 1 and path[:i+1] == root_path:
+                        zone_a = path[i] #START #B
+                        zone_b = path[i + 1] #B #D
                         connection = zone_a.neighbors.get(zone_b)
                         if connection:
                             forbidden_connections.add(connection)
+                        # forbidden_connections = {START-B}
+                        # forbidden_connections = {B-D}
 
-                spur_path = self.dijkstra(
-                    start=branch_node,
+                branch_path = self.dijkstra(
+                    start=branch_node,#START #B
                     end=self.end_hub,
-                    forbidden_connections=forbidden_connections,
-                    forbidden_nodes=forbidden_nodes,
+                    forbidden_connections=forbidden_connections, #{START-B} #{B-D}
+                    forbidden_nodes=forbidden_nodes, # .. # {START}
                 )
 
-                if spur_path is None:
+                if branch_path is None:
                     continue
 
-                total_path = root_path[:-1] + spur_path
+                total_path = root_path[:-1] + branch_path
+                #total_path = [] + [START, A, D, F, END] 
+                #total_path = [START] + [B, C, E, END]
 
                 if total_path not in paths and total_path not in candidates:
                     candidates.append(total_path)
-
+                # candidates = [
+                #     [START, A, D, F, END],
+                #     [START, B, C, E, END]
+                # ]
             if not candidates:
                 break
 
