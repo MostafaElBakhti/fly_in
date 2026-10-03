@@ -120,7 +120,7 @@ class Map:
         path.reverse()
         return path
 
-    def find_all_paths(self, max_paths=5):
+    def find_all_paths(self, max_paths=1):
         first_path = self.dijkstra()
         if first_path is None:
             return []
@@ -170,6 +170,7 @@ class Map:
                 #total_path = [] + [START, A, D, F, END] 
                 #total_path = [START] + [B, C, E, END]
                 #total_path = [START , B] + [D, E, END]
+                
 
                 if total_path not in paths and total_path not in candidates:
                     candidates.append(total_path)

@@ -9,7 +9,7 @@ from simulator import DeadlockError, Simulator
 def main(filename: str = "map.txt", visual: bool = False) -> int:
     """Print movement turns, reporting unsolvable inputs on stderr."""
     data = parse_map_file(filename)
-    paths = data.find_all_paths(max_paths=5)
+    paths = data.find_all_paths(max_paths=2)
 
     if not paths:
         print("Error: no route connects start to end.", file=sys.stderr)

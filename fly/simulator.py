@@ -81,9 +81,9 @@ class Simulator:
         """Print only movement turns on stdout; return the total turn count."""
         self._select_paths() # gets the best paths 
         self.assign_paths() # assign for each drone a path 
-        self.history.clear() # 
-        self.save_turn()
-        self.turns = self._simulate()
+        self.history.clear() # clear the last history 
+        self.save_turn() # save the turn after completing phase 1 and phase 2
+        self.turns = self._simulate() # simulate the best distrubition
         print(f"Final turns: {self.turns}", file=sys.stderr)
         return self.turns
 
@@ -102,12 +102,8 @@ class Simulator:
         self, current_drones: list[Drone], allow_pipeline: bool,
         waiting: set[int] | None = None,
     ) -> tuple[list[Drone], list[str]] | None:
-        """Try one turn on copies, keeping the real drones unchanged.
+        """Try one turn on copies, keeping the real drones unchanged."""
 
-        Pipeline mode permits a restricted departure into an occupied zone;
-        _simulate accepts it after checking next turn's mandatory arrivals.
-        Conservative mode reserves an empty destination slot immediately.
-        """
         drones = [copy(drone) for drone in current_drones]
         waiting = waiting or set()
         start_hub = self.map_data.start_hub
@@ -120,8 +116,7 @@ class Simulator:
         moved_this_turn = set()
         moves_this_turn = {}
 
-        # Phase 1: finish restricted movements from the previous turn.
-        # Every occupied connection is freed by its arrival this turn.
+        # Phase 1: 
         for drone in drones:
             if drone.transit_turns == 0:
                 continue
@@ -138,7 +133,7 @@ class Simulator:
             moved_this_turn.add(drone.id)
             moves_this_turn[drone.id] = f"{drone.name}-{next_zone.name}"
 
-        # Phase 2: decide new movements. Repeat when departures free space.
+        # Phase 2
         progress = True
         while progress:
             progress = False
@@ -160,7 +155,6 @@ class Simulator:
                 is_hub = next_zone in (start_hub, end_hub)
                 occupancy = zone_occupancy[next_zone]
                 if restricted:
-                    # A pipeline arrival needs room next turn, not now.
                     if allow_pipeline:
                         occupancy = 0
                     occupancy += zone_reservations[next_zone]
@@ -188,8 +182,6 @@ class Simulator:
                         f"{drone.name}-{next_zone.name}"
                     )
 
-        # Mandatory arrivals can temporarily fill a zone before departures.
-        # Only a complete turn with valid final occupancy may be committed.
         for zone, occupancy in zone_occupancy.items():
             if zone not in (start_hub, end_hub):
                 if occupancy > zone.metadata.max_drones:
@@ -219,7 +211,7 @@ class Simulator:
         turn = 1
         guaranteed_next_turn = None
         while any(not drone.finished for drone in self.drones):
-            # Try the familiar movement loop on copies, then preview arrivals.
+
             waiting = set()
             planned = None
             preview = None
@@ -230,8 +222,7 @@ class Simulator:
                     preview = self._plan_turn(planned[0], False)
                 if preview is not None:
                     break
-                # An unsafe arrival or a head-on conflict needs more waiting.
-                # Give lower-ID drones priority and try the turn again.
+
                 departures = [
                     drone.id for drone in self.drones
                     if not drone.finished and not drone.transit_turns
