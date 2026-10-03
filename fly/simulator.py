@@ -63,7 +63,7 @@ class Simulator:
             trial = Simulator(self.map_data, candidate_paths)
             trial.assign_paths()
             try:
-                turns = trial._simulate(emit_output=False)
+                turns = trial._simulate(record_output=False)
             except DeadlockError:
                 continue
             if turns < best_turns:
@@ -74,12 +74,14 @@ class Simulator:
                 "No candidate route set can deliver all drones."
             )
         self.paths = best_paths
+        # self.assign_paths()
+
 
     def run(self) -> int:
         """Print only movement turns on stdout; return the total turn count."""
-        self._select_paths()
-        self.assign_paths()
-        self.history.clear()
+        self._select_paths() # gets the best paths 
+        self.assign_paths() # assign for each drone a path 
+        self.history.clear() # 
         self.save_turn()
         self.turns = self._simulate()
         print(f"Final turns: {self.turns}", file=sys.stderr)
@@ -197,7 +199,7 @@ class Simulator:
             return None
         return drones, output
 
-    def _simulate(self, emit_output: bool = True) -> int:
+    def _simulate(self, record_output: bool = True) -> int:
         """Finish arrivals, decide departures, and commit one safe turn."""
         start_hub = self.map_data.start_hub
         end_hub = self.map_data.end_hub
@@ -261,7 +263,7 @@ class Simulator:
                 drone.pending_zone = next_drone.pending_zone
                 drone.pending_connection = next_drone.pending_connection
             guaranteed_next_turn = preview
-            if emit_output:
+            if record_output:
                 print(" ".join(moves_this_turn))
                 self.save_turn()
             turn += 1
