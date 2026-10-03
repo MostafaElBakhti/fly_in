@@ -8,7 +8,7 @@ from map import Map
 
 
 class DeadlockError(Exception):
-    pass
+    print("tt")
 
 
 class Simulator:
@@ -27,7 +27,8 @@ class Simulator:
         self.drones = [
             Drone(i + 1, map_data.start_hub, map_data.end_hub)
             for i in range(map_data.nb_drones)
-        ] # D1 D2 D3 D4 D5 D6 D7 D8 D9 D10
+        ] 
+        # D1 D2 D3 D4 D5 D6 D7 D8 D9 D10
         self.history: list[dict[str, tuple[float, float]]] = []
         self.turns = 0
 
