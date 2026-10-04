@@ -8,8 +8,7 @@ from map import Map
 
 
 class DeadlockError(Exception):
-    print("tt")
-
+    pass
 
 class Simulator:
 
@@ -30,7 +29,7 @@ class Simulator:
         ] 
         # D1 D2 D3 D4 D5 D6 D7 D8 D9 D10
         self.history: list[dict[str, tuple[float, float]]] = []
-        self.turns = 0
+        # self.turns = 0
 
     def assign_paths(self) -> None:
         """Balance drones over routes using path cost and assigned count."""
@@ -75,10 +74,30 @@ class Simulator:
             )
         self.paths = best_paths
         # self.assign_paths()
+    def _validate_paths(self) -> None:
+        start = self.map_data.start_hub
+        end = self.map_data.end_hub
 
+        if start is None or end is None:
+            raise ValueError("The map must have a start hub and an end hub.")
+        if not self.paths:
+            raise ValueError("No valid paths found.")
+
+        for path in self.paths:
+            if not path or path[0] is not start:
+                raise ValueError("A route must begin at the start hub.")
+            if path[-1] is not end:
+                raise ValueError("A route must finish at the end hub.")
+
+            for source, destination in zip(path, path[1:]):
+                if destination.metadata.zone == "blocked":
+                    raise ValueError("A route enters a blocked zone.")
+                if destination not in source.neighbors:
+                    raise ValueError("A route uses a missing connection.")
 
     def run(self) -> int:
         """Print only movement turns on stdout; return the total turn count."""
+        self._validate_paths() 
         self._select_paths() # gets the best paths 
         self.assign_paths() # assign for each drone a path 
         self.history.clear() # clear the last history 
@@ -193,20 +212,20 @@ class Simulator:
 
     def _simulate(self, record_output: bool = True) -> int:
         """Finish arrivals, decide departures, and commit one safe turn."""
-        start_hub = self.map_data.start_hub
-        end_hub = self.map_data.end_hub
-        if start_hub is None or end_hub is None:
-            raise ValueError("The map must have a start hub and an end hub.")
-        for drone in self.drones:
-            if not drone.path or drone.path[0] is not start_hub:
-                raise ValueError(f"{drone.name} has an invalid route.")
-            if drone.path[-1] is not end_hub:
-                raise ValueError(f"{drone.name} has an invalid destination.")
-            for source, destination in zip(drone.path, drone.path[1:]):
-                if destination.metadata.zone == "blocked":
-                    raise ValueError("A route enters a blocked zone.")
-                if destination not in source.neighbors:
-                    raise ValueError("A route uses a missing connection.")
+        # start_hub = self.map_data.start_hub
+        # end_hub = self.map_data.end_hub
+        # if start_hub is None or end_hub is None:
+        #     raise ValueError("The map must have a start hub and an end hub.")
+        # for drone in self.drones:
+        #     if not drone.path or drone.path[0] is not start_hub:
+        #         raise ValueError(f"{drone.name} has an invalid route.")
+        #     if drone.path[-1] is not end_hub:
+        #         raise ValueError(f"{drone.name} has an invalid destination.")
+        #     for source, destination in zip(drone.path, drone.path[1:]):
+        #         if destination.metadata.zone == "blocked":
+        #             raise ValueError("A route enters a blocked zone.")
+        #         if destination not in source.neighbors:
+        #             raise ValueError("A route uses a missing connection.")
 
         turn = 1
         guaranteed_next_turn = None
@@ -217,6 +236,11 @@ class Simulator:
             preview = None
             while True:
                 planned = self._plan_turn(self.drones, True, waiting)
+                # if turn == 1 and record_output:
+                #     test = planned[0][0]
+                #     print("*" * 20)
+                #     print(test.name)
+                #     print("*" * 20)
                 preview = None
                 if planned is not None:
                     preview = self._plan_turn(planned[0], False)
