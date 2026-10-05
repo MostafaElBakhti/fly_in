@@ -174,7 +174,7 @@ class Simulator:
                 is_hub = next_zone in (start_hub, end_hub)
                 occupancy = zone_occupancy[next_zone]
                 if restricted:
-                    if allow_pipeline:
+                    if allow_pipeline:  
                         occupancy = 0
                     occupancy += zone_reservations[next_zone]
                 if not is_hub and occupancy >= next_zone.metadata.max_drones:
@@ -241,7 +241,7 @@ class Simulator:
                 #     print("*" * 20)
                 #     print(test.name)
                 #     print("*" * 20)
-                preview = None
+                preview = None  
                 if planned is not None:
                     preview = self._plan_turn(planned[0], False)
                 if preview is not None:
