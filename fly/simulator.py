@@ -68,6 +68,9 @@ class Simulator:
             if turns < best_turns:
                 best_turns = turns
                 best_paths = candidate_paths
+        # for path in best_paths:
+        #     print([zone.name for zone in path])
+
         if best_paths is None:
             raise DeadlockError(
                 "No candidate route set can deliver all drones."
@@ -118,7 +121,7 @@ class Simulator:
         self.history.append(positions)
 
     def _plan_turn(
-        self, current_drones: list[Drone], allow_pipeline: bool,
+        self, current_drones: list[Drone], ignore_current: bool,
         waiting: set[int] | None = None,
     ) -> tuple[list[Drone], list[str]] | None:
         """Try one turn on copies, keeping the real drones unchanged."""
@@ -174,7 +177,7 @@ class Simulator:
                 is_hub = next_zone in (start_hub, end_hub)
                 occupancy = zone_occupancy[next_zone]
                 if restricted:
-                    if allow_pipeline:  
+                    if ignore_current:  
                         occupancy = 0
                     occupancy += zone_reservations[next_zone]
                 if not is_hub and occupancy >= next_zone.metadata.max_drones:
@@ -236,11 +239,6 @@ class Simulator:
             preview = None
             while True:
                 planned = self._plan_turn(self.drones, True, waiting)
-                # if turn == 1 and record_output:
-                #     test = planned[0][0]
-                #     print("*" * 20)
-                #     print(test.name)
-                #     print("*" * 20)
                 preview = None  
                 if planned is not None:
                     preview = self._plan_turn(planned[0], False)
@@ -256,19 +254,17 @@ class Simulator:
                     break
                 waiting.add(max(departures))
             if planned is None or preview is None or not planned[1]:
-                # Reuse the safe preview saved last turn, or use the old
-                # conservative reservation rule when there is no saved plan.
+
                 planned = guaranteed_next_turn
                 if planned is None:
                     planned = self._plan_turn(
-                        self.drones, allow_pipeline=False,
+                        self.drones, ignore_current=False,
                     )
                 if planned is not None:
-                    preview = self._plan_turn(planned[0], allow_pipeline=False)
+                    preview = self._plan_turn(planned[0], ignore_current=False)
             if planned is None or preview is None or not planned[1]:
                 raise DeadlockError(f"No safe drone movement on turn {turn}.")
 
-            # All decisions are complete before the real drone states change.
             next_drones, moves_this_turn = planned
             for drone, next_drone in zip(self.drones, next_drones):
                 drone.position = next_drone.position
@@ -279,7 +275,21 @@ class Simulator:
                 drone.pending_connection = next_drone.pending_connection
             guaranteed_next_turn = preview
             if record_output:
-                print(" ".join(moves_this_turn))
+                # print(" ".join(moves_this_turn))
                 self.save_turn()
+
+                i = 0
+                for zone, _ in self.map_data.zone_by_name.items():
+                    print(zone)
+                    i += 1
+                    if i == 1:
+                        break
+
+                # for idx , drone in enumerate(self.drones):
+                #     print("**" * 5)
+                #     print(f" in turn {turn} : the drone  {idx +1} is in {drone.name} ")
+                #     print("**" * 5)
+                # for  path in (self.paths):
+                #     print(path)
             turn += 1
         return turn - 1

@@ -1,0 +1,10 @@
+   Clear handling of disconnected        Fail. An unhandled ValueError
+   maps                                  causes a traceback.
+  ────────────────────────────────────  ─────────────────────────────────────
+   Required movement-only output         Fail. Debug route lists are printed
+                                         before the movements.
+  ────────────────────────────────────  ─────────────────────────────────────
+   Connections may reference             Fail in one valid ordering. Your
+   previously defined zones              parser requires end_hub before any
+                                         connection, even one connecting two
+                                         already-defined zones.
