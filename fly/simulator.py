@@ -278,12 +278,12 @@ class Simulator:
                 # print(" ".join(moves_this_turn))
                 self.save_turn()
 
-                i = 0
-                for zone, _ in self.map_data.zone_by_name.items():
-                    print(zone)
-                    i += 1
-                    if i == 1:
-                        break
+                # i = 0
+                # for zone, _ in self.map_data.zone_by_name.items():
+                #     print(zone)
+                #     i += 1
+                #     if i == 1:
+                #         break
 
                 # for idx , drone in enumerate(self.drones):
                 #     print("**" * 5)
