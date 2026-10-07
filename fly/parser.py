@@ -64,7 +64,7 @@ def parse_zone(line: str, data: Map, zone_name: str) -> Zone:
 
     allowed_metadata = {"zone", "color", "max_drones"}
     for key in metadata_values:
-        if key not in allowed_metadata:
+        if key.lower() not in allowed_metadata:
             raise ValueError(f"unknown zone metadata: {key}")
 
     parts = main.split()
@@ -153,6 +153,7 @@ def parse_map_file(filename: str) -> Map:
     found_start = False
     found_end = False
     first_definition = True
+    pending_connections: list[tuple[int, str]] = []
 
     try:
         with open(filename, "r") as file:
@@ -195,11 +196,7 @@ def parse_map_file(filename: str) -> Map:
                 data.zones.append(parse_zone(line, data, "hub:"))
 
             elif line.startswith("connection:"):
-                if not found_start:
-                    raise ValueError("missing start_hub definition")
-                if not found_end:
-                    raise ValueError("missing end_hub definition")
-                data.connections.append(parse_connection(line, data))
+                pending_connections.append((line_number, line))
 
             else:
                 raise ValueError("unknown definition")
@@ -217,6 +214,13 @@ def parse_map_file(filename: str) -> Map:
         sys.exit(
             f"line {len(lines) + 1}: missing end_hub definition"
         )
+
+    for line_number, line in pending_connections:
+        try:
+            data.connections.append(parse_connection(line, data))
+        except ValueError as error:
+            print(f"Error: line {line_number}: {error}", file=sys.stderr)
+            sys.exit(1)
 
     data.build_neighbors()
     return data

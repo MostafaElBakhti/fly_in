@@ -84,7 +84,7 @@ class Simulator:
         if start is None or end is None:
             raise ValueError("The map must have a start hub and an end hub.")
         if not self.paths:
-            raise ValueError("No valid paths found.")
+            sys.exit("Error: no valid path connects start_hub to end_hub.")
 
         for path in self.paths:
             if not path or path[0] is not start:
@@ -275,7 +275,7 @@ class Simulator:
                 drone.pending_connection = next_drone.pending_connection
             guaranteed_next_turn = preview
             if record_output:
-                # print(" ".join(moves_this_turn))
+                print(" ".join(moves_this_turn))
                 self.save_turn()
 
                 # i = 0
