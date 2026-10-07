@@ -35,10 +35,20 @@ Routes are calculated before movement and reused. This is a heuristic: it does n
 
 ## Visualization
 
-Pygame shows colored zones, capacities, connections, and purple drone markers. Drones in transit appear midway along a connection, making waiting and restricted moves easier to follow.
+Run `python3 main.py map.txt --visual` to open the Pygame replay after the
+simulation completes. It shows the network at the map coordinates, zone colors
+and types, zone and link capacities, and clearly marked start/end hubs. Unknown
+color words receive a consistent fallback color. Blocked zones have an X.
 
-- **Right / Space:** next turn.
+Purple badges show drone positions; drones sharing a position are grouped with
+a count. Restricted moves appear midway along a connection during transit.
+The turn counter and progress bar make waiting and movement costs easy to follow.
+Resize the window to fit the map. Buttons and keyboard controls support replay:
+
+- **Right:** next turn.
 - **Left:** previous turn.
+- **Space:** play/pause (one turn every 0.7 seconds).
+- **R:** reset to turn zero.
 - **Esc:** close.
 
 ## Example
@@ -72,3 +82,5 @@ Each line is one turn; waiting drones are omitted. Restricted moves use `D1-sour
 - [Pygame documentation](https://www.pygame.org/docs/): graphical display and controls.
 
 AI assistance for this README: reading the subject, checking the implementation, drafting documentation, and verifying the example. Add any earlier AI use in the project before submission.
+AI assistance was also used to implement and check the Pygame replay and its
+command-line integration.

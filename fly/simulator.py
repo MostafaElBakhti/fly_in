@@ -10,6 +10,7 @@ from map import Map
 class DeadlockError(Exception):
     pass
 
+
 class Simulator:
 
     def __init__(self, map_data: Map, paths: list[list[Zone]]) -> None:
@@ -26,7 +27,7 @@ class Simulator:
         self.drones = [
             Drone(i + 1, map_data.start_hub, map_data.end_hub)
             for i in range(map_data.nb_drones)
-        ] 
+        ]
         # D1 D2 D3 D4 D5 D6 D7 D8 D9 D10
         self.history: list[dict[str, tuple[float, float]]] = []
         # self.turns = 0
@@ -77,6 +78,7 @@ class Simulator:
             )
         self.paths = best_paths
         # self.assign_paths()
+
     def _validate_paths(self) -> None:
         start = self.map_data.start_hub
         end = self.map_data.end_hub
@@ -100,12 +102,12 @@ class Simulator:
 
     def run(self) -> int:
         """Print only movement turns on stdout; return the total turn count."""
-        self._validate_paths() 
-        self._select_paths() # gets the best paths 
-        self.assign_paths() # assign for each drone a path 
-        self.history.clear() # clear the last history 
-        self.save_turn() # save the turn after completing phase 1 and phase 2
-        self.turns = self._simulate() # simulate the best distrubition
+        self._validate_paths()
+        self._select_paths()  # gets the best paths
+        self.assign_paths()  # assign for each drone a path
+        self.history.clear()  # clear the last history
+        self.save_turn()  # save the turn after completing phase 1 and phase 2
+        self.turns = self._simulate()  # simulate the best distrubition
         print(f"Final turns: {self.turns}", file=sys.stderr)
         return self.turns
 
@@ -138,7 +140,7 @@ class Simulator:
         moved_this_turn = set()
         moves_this_turn = {}
 
-        # Phase 1: 
+        # Phase 1:
         for drone in drones:
             if drone.transit_turns == 0:
                 continue
@@ -177,7 +179,7 @@ class Simulator:
                 is_hub = next_zone in (start_hub, end_hub)
                 occupancy = zone_occupancy[next_zone]
                 if restricted:
-                    if ignore_current:  
+                    if ignore_current:
                         occupancy = 0
                     occupancy += zone_reservations[next_zone]
                 if not is_hub and occupancy >= next_zone.metadata.max_drones:
@@ -215,21 +217,6 @@ class Simulator:
 
     def _simulate(self, record_output: bool = True) -> int:
         """Finish arrivals, decide departures, and commit one safe turn."""
-        # start_hub = self.map_data.start_hub
-        # end_hub = self.map_data.end_hub
-        # if start_hub is None or end_hub is None:
-        #     raise ValueError("The map must have a start hub and an end hub.")
-        # for drone in self.drones:
-        #     if not drone.path or drone.path[0] is not start_hub:
-        #         raise ValueError(f"{drone.name} has an invalid route.")
-        #     if drone.path[-1] is not end_hub:
-        #         raise ValueError(f"{drone.name} has an invalid destination.")
-        #     for source, destination in zip(drone.path, drone.path[1:]):
-        #         if destination.metadata.zone == "blocked":
-        #             raise ValueError("A route enters a blocked zone.")
-        #         if destination not in source.neighbors:
-        #             raise ValueError("A route uses a missing connection.")
-
         turn = 1
         guaranteed_next_turn = None
         while any(not drone.finished for drone in self.drones):
@@ -239,7 +226,7 @@ class Simulator:
             preview = None
             while True:
                 planned = self._plan_turn(self.drones, True, waiting)
-                preview = None  
+                preview = None
                 if planned is not None:
                     preview = self._plan_turn(planned[0], False)
                 if preview is not None:
@@ -278,18 +265,5 @@ class Simulator:
                 print(" ".join(moves_this_turn))
                 self.save_turn()
 
-                # i = 0
-                # for zone, _ in self.map_data.zone_by_name.items():
-                #     print(zone)
-                #     i += 1
-                #     if i == 1:
-                #         break
-
-                # for idx , drone in enumerate(self.drones):
-                #     print("**" * 5)
-                #     print(f" in turn {turn} : the drone  {idx +1} is in {drone.name} ")
-                #     print("**" * 5)
-                # for  path in (self.paths):
-                #     print(path)
             turn += 1
         return turn - 1
