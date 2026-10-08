@@ -10,11 +10,8 @@ class Visualizer:
         self.map = map_data
         self.simulation = simulation
 
-        self.width = 800
-        self.height = 1200
-
         self.screen = pygame.display.set_mode(
-            (self.width, self.height),
+            (2000, 1800),
             pygame.RESIZABLE
         )
 
@@ -36,27 +33,36 @@ class Visualizer:
         self.map_width = self.max_x - self.min_x
         self.map_height = self.max_y - self.min_y
 
-        self.margin = 100
+        self.margin = 60
+        self.update_layout()
 
-        self.usable_width = self.width - self.margin * 2
-        self.usable_height = self.height - self.margin * 2
+    def update_layout(self):
+        """Recompute scale and sizes from the current window size."""
+        self.width, self.height = self.screen.get_size()
 
-        scale_x = self.usable_width / max(1, self.map_width)
-        scale_y = self.usable_height / max(1, self.map_height)
+        usable_width = self.width - self.margin * 2
+        usable_height = self.height - self.margin * 2
 
+        scale_x = usable_width / max(1, self.map_width)
+        scale_y = usable_height / max(1, self.map_height)
         self.scale = min(scale_x, scale_y)
 
-        self.visual_scale = self.scale / 50
+        # Center the map in the window
+        self.offset_x = (self.width - self.map_width * self.scale) / 2
+        self.offset_y = (self.height - self.map_height * self.scale) / 2
 
-        self.zone_radius = max(6, int(20 * self.visual_scale))
-        self.line_width = max(1, int(3 * self.visual_scale))
+        # Sizes come from the distance between two grid units,
+        # so zones can never be bigger than the space between them
+        self.zone_radius = max(2, min(20, int(self.scale * 0.35)))
+        self.line_width = max(1, self.zone_radius // 4)
 
-        self.font_size = max(10, int(18 * self.visual_scale))
+        self.font_size = max(12, min(20, self.zone_radius * 2))
         self.font = pygame.font.Font(None, self.font_size)
+        self.show_labels = self.zone_radius >= 8
 
     def map_to_screen(self, x, y):
-        screen_x = (x - self.min_x) * self.scale + self.margin
-        screen_y = (y - self.min_y) * self.scale + self.margin
+        screen_x = (x - self.min_x) * self.scale + self.offset_x
+        screen_y = (y - self.min_y) * self.scale + self.offset_y
 
         return int(screen_x), int(screen_y)
 
@@ -86,25 +92,15 @@ class Visualizer:
 
         for zone in self.map.zone_by_name.values():
             for neighbor in zone.neighbors:
-
-                connection_key = tuple(
-                    sorted((zone.name, neighbor.name))
-                )
+                connection_key = tuple(sorted((zone.name, neighbor.name)))
 
                 if connection_key in drawn:
                     continue
 
                 drawn.add(connection_key)
 
-                start = self.map_to_screen(
-                    zone.x,
-                    zone.y
-                )
-
-                end = self.map_to_screen(
-                    neighbor.x,
-                    neighbor.y
-                )
+                start = self.map_to_screen(zone.x, zone.y)
+                end = self.map_to_screen(neighbor.x, neighbor.y)
 
                 pygame.draw.line(
                     self.screen,
@@ -116,52 +112,36 @@ class Visualizer:
 
     def draw_zones(self):
         for zone in self.map.zone_by_name.values():
-            x, y = self.map_to_screen(
-                zone.x,
-                zone.y
-            )
-
-            color = self.get_zone_color(zone)
+            x, y = self.map_to_screen(zone.x, zone.y)
 
             pygame.draw.circle(
                 self.screen,
-                color,
+                self.get_zone_color(zone),
                 (x, y),
                 self.zone_radius
             )
 
-            text = self.font.render(
-                zone.name,
-                True,
-                (255, 255, 255)
-            )
+            if not self.show_labels:
+                continue
 
+            text = self.font.render(zone.name, True, (255, 255, 255))
             text_rect = text.get_rect(
-                center=(
-                    x,
-                    y - self.zone_radius - self.font_size
-                )
+                center=(x, y - self.zone_radius - self.font_size // 2)
             )
-
-            self.screen.blit(
-                text,
-                text_rect
-            )
+            self.screen.blit(text, text_rect)
 
     def run(self):
         while self.running:
-
             for event in pygame.event.get():
-
                 if event.type == pygame.QUIT:
                     self.running = False
+                elif event.type == pygame.VIDEORESIZE:
+                    self.update_layout()
 
             self.screen.fill((30, 30, 30))
 
-            # Connections first
+            # Connections first, zones on top
             self.draw_connections()
-
-            # Zones on top
             self.draw_zones()
 
             pygame.display.flip()
@@ -169,57 +149,3 @@ class Visualizer:
             self.clock.tick(60)
 
         pygame.quit()
-
-
-#     def draw(self):
-#         self.screen.fill((30, 30, 30))
-
-#         speed = 0.01
-#         progress = 0.0
-#         speed = 0.1
-
-#         pygame.draw.line(
-#             self.screen,
-#             "white",
-#             (200, 900),
-#             (1200, 900),
-#             10
-#         )
-
-#         pygame.draw.circle(
-#             self.screen,
-#             ("red"),
-#             (200, 900),
-#             100
-#         )
-
-#         pygame.draw.circle(
-#             self.screen,
-#             ("red"),
-#             (1200, 900),
-#             100
-#         )
-
-#         x = 200 + (1200 - 200 ) * self.progress
-#         pygame.draw.circle(
-#             self.screen,
-#             ("green"),
-#             (x, 900),
-#             50
-#         )
-
-#         if self.progress <= 1.0:
-#             self.progress += self.speed
-
-#         pygame.display.flip()
-
-
-#     def run(self):
-#         while self.running:
-#             for event in pygame.event.get():
-#                 if event.type == pygame.QUIT:
-#                     self.running = False
-#             self.draw()
-#             self.clock.tick(80)
-
-#         pygame.quit()
