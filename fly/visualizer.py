@@ -19,7 +19,7 @@ class Visualizer:
 
         self.running = True
         self.progress = 0.0
-        self.speed = 0.01
+        self.speed = 2
         self.turn = 0
         self.clock = pygame.time.Clock()
 
@@ -47,13 +47,10 @@ class Visualizer:
         scale_y = usable_height / max(1, self.map_height)
         self.scale = min(scale_x, scale_y)
 
-        # Center the map in the window
         self.offset_x = (self.width - self.map_width * self.scale) / 2
         self.offset_y = (self.height - self.map_height * self.scale) / 2
 
-        # Sizes come from the distance between two grid units,
-        # so zones can never be bigger than the space between them
-        self.zone_radius = max(2, min(20, int(self.scale * 0.35)))
+        self.zone_radius = max(2, min(40, int(self.scale * 0.35)))
         self.line_width = max(1, self.zone_radius // 4)
 
         self.font_size = max(12, min(20, self.zone_radius * 2))
@@ -73,14 +70,6 @@ class Visualizer:
             return pygame.Color(200, 200, 200)
 
         color = str(color).strip()
-
-        # Allow colors like: bbb
-        if len(color) == 3 and all(c in "0123456789abcdefABCDEF" for c in color):
-            color = "#" + "".join(c * 2 for c in color)
-
-        # Allow colors like: FF0000
-        elif len(color) == 6 and all(c in "0123456789abcdefABCDEF" for c in color):
-            color = "#" + color
 
         try:
             return pygame.Color(color)
@@ -130,22 +119,90 @@ class Visualizer:
             )
             self.screen.blit(text, text_rect)
 
+    def update_animation(self, dt):
+        """Advance playback using elapsed time in seconds."""
+        history = self.simulation.history
+
+        if not history or self.turn >= len(history) - 1:
+            return
+
+        self.progress += dt * self.speed
+
+        while self.progress >= 1.0:
+            self.progress -= 1.0
+            self.turn += 1
+
+            if self.turn >= len(history) - 1:
+                self.progress = 0.0
+                break
+
+    def draw_drones(self):
+        """Draw drones between the current and next saved positions."""
+        history = self.simulation.history
+
+        if not history:
+            return
+
+        current = history[self.turn]
+        following = history[min(self.turn + 1, len(history) - 1)]
+
+        radius = max(6, self.zone_radius // 2)
+
+        for name, (start_x, start_y) in current.items():
+            end_x, end_y = following.get(name, (start_x, start_y))
+
+            x = start_x + (end_x - start_x) * self.progress
+            y = start_y + (end_y - start_y) * self.progress
+
+            position = self.map_to_screen(x, y)
+
+            pygame.draw.circle(
+                self.screen,
+                (255, 190, 60),
+                position,
+                radius
+            )
+            pygame.draw.circle(
+                self.screen,
+                (255, 255, 255),
+                position,
+                radius,
+                1
+            )
+
     def run(self):
+        paused = False
+
         while self.running:
+            dt = self.clock.tick(60) / 1000.0
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+
                 elif event.type == pygame.VIDEORESIZE:
                     self.update_layout()
 
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        paused = not paused
+
+                    elif event.key == pygame.K_r:
+                        self.turn = 0
+                        self.progress = 0.0
+
+            if not self.running:
+                break
+
+            if not paused:
+                self.update_animation(dt)
+
             self.screen.fill((30, 30, 30))
 
-            # Connections first, zones on top
             self.draw_connections()
             self.draw_zones()
+            self.draw_drones()
 
             pygame.display.flip()
-
-            self.clock.tick(60)
 
         pygame.quit()
