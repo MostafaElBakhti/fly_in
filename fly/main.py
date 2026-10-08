@@ -1,7 +1,5 @@
 """Run the drone simulation for a supplied map file."""
 
-import argparse
-
 from simulator import Simulator
 from parser import Parser
 from visualizer import Visualizer
@@ -20,8 +18,9 @@ def main(filename: str = "map.txt", visual: bool = False) -> int:
 
     simulation.run()
 
-    visualizer = Visualizer(data, simulation) 
+    visualizer = Visualizer(data, simulation)
     visualizer.run()
+    return (0)
 
 
 if __name__ == "__main__":

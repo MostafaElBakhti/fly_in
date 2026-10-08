@@ -1,6 +1,6 @@
 from map import Map
 from simulator import Simulator
-import pygame  # type: ignore[reportMissingImports]
+import pygame
 
 
 class Visualizer:

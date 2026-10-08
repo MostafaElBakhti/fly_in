@@ -2,10 +2,11 @@ import sys
 from classes import Connection, Zone, ZoneMetadata
 from map import Map
 
+
 class Parser:
 
     ZONE_TYPES = ["normal", "blocked", "restricted", "priority"]
-    save_coordinate = []
+    # save_coordinate: list = []
 
     def parse_metadata(self, value: str) -> tuple[str, dict[str, str]]:
         if "[" not in value and "]" not in value:
@@ -35,7 +36,6 @@ class Parser:
 
         return main, metadata
 
-
     def positive_integer(self, value: str, field_name: str) -> int:
         if "_" in value:
             raise ValueError(f"{field_name} must be a positive integer")
@@ -50,13 +50,11 @@ class Parser:
             raise ValueError(f"{field_name} must be a positive integer")
         return number
 
-
     def valid_zone_name(self, name: str) -> bool:
 
         return bool(name) and "-" not in name and not any(
             char.isspace() for char in name
         )
-
 
     def parse_zone(self, line: str, data: Map, zone_name: str) -> Zone:
         value = line.split(":", 1)[1].strip()
@@ -77,22 +75,21 @@ class Parser:
         if name in data.zone_by_name:
             raise ValueError(f"duplicate zone name: {name}")
 
-        
         try:
             x = int(x_value)
             y = int(y_value)
         except ValueError:
-            raise ValueError("zone coordinates must be integers") 
-        if (x,y) in self.save_coordinate :
-            raise ValueError("duplicated coordinates")
-        self.save_coordinate.append((x,y))
-        # print(self.save_coordinate)
+            raise ValueError("zone coordinates must be integers")
+        # if (x, y) in self.save_coordinate:
+        #     raise ValueError("duplicated coordinates")
+        # self.save_coordinate.append((x, y))
+        # # print(self.save_coordinate)
         zone_type = metadata_values.get("zone", "normal").lower()
         if zone_type not in self.ZONE_TYPES:
             raise ValueError(f"invalid zone type: {zone_type}")
 
         color = metadata_values.get("color", "none")
-        if not color :
+        if not color:
             raise ValueError("color must be a single word")
 
         max_drones = 1
@@ -105,7 +102,6 @@ class Parser:
         zone = Zone(name, x, y, metadata)
         data.zone_by_name[name] = zone
         return zone
-
 
     def parse_connection(self, line: str, data: Map) -> Connection:
         value = line.split(":", 1)[1].strip()
@@ -122,7 +118,10 @@ class Parser:
         name_a, name_b = main.split("-", 1)
         if name_a == name_b:
             raise ValueError("connection cannot be connected to itself")
-        if not self.valid_zone_name(name_a) or not self.valid_zone_name(name_b):
+        if (
+            not self.valid_zone_name(name_a)
+            or not self.valid_zone_name(name_b)
+        ):
             raise ValueError("connection contains an invalid zone name")
         if name_a not in data.zone_by_name:
             raise ValueError(f"undefined zone in connection: {name_a}")
@@ -149,7 +148,6 @@ class Parser:
             )
 
         return Connection(zone_a, zone_b, max_link_capacity)
-
 
     def parse_map_file(self, filename: str) -> Map:
         data = Map()

@@ -29,9 +29,6 @@ class Drone:
         self.path = path if path is not None else []
         self.position = 0
         self.finished = False
-        # in-flight state for multi-turn (restricted) moves:
-        # transit_turns == 0 -> free, can decide a new move
-        # transit_turns == 1 -> mid-flight, must arrive this turn
         self.transit_turns = 0
         self.pending_zone = None
         self.pending_connection = None

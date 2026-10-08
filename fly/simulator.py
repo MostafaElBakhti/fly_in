@@ -3,7 +3,7 @@ from copy import copy
 import sys
 from collections import Counter
 
-from classes import Drone, Zone
+from classes import Connection, Drone, Zone
 from map import Map
 
 
@@ -16,14 +16,6 @@ class Simulator:
     def __init__(self, map_data: Map, paths: list[list[Zone]]) -> None:
         self.map_data = map_data
         self.paths = paths
-        # self.paths = [
-        #     P1, P2, P3, P4, P5
-        # ]
-        # P1 = START → B → D → F → END
-        # P2 = START → A → D → F → END
-        # P3 = START → B → D → E → END
-        # P4 = START → A → D → E → END
-        # P5 = START → B → C → E → END
         self.drones = [
             Drone(i + 1, map_data.start_hub, map_data.end_hub)
             for i in range(map_data.nb_drones)
@@ -57,9 +49,6 @@ class Simulator:
         best_turns = float("inf")
         for count in range(1, len(self.paths) + 1):
             candidate_paths = self.paths[:count]
-            # candidate_paths = [
-            #     [START, B, D, F, END]
-            # ]
             trial = Simulator(self.map_data, candidate_paths)
             trial.assign_paths()
             try:
@@ -69,8 +58,6 @@ class Simulator:
             if turns < best_turns:
                 best_turns = turns
                 best_paths = candidate_paths
-        # for path in best_paths:
-        #     print([zone.name for zone in path])
 
         if best_paths is None:
             raise DeadlockError(
@@ -103,11 +90,11 @@ class Simulator:
     def run(self) -> int:
         """Print only movement turns on stdout; return the total turn count."""
         self._validate_paths()
-        self._select_paths()  # gets the best paths
-        self.assign_paths()  # assign for each drone a path
-        self.history.clear()  # clear the last history
-        self.save_turn()  # save the turn after completing phase 1 and phase 2
-        self.turns = self._simulate()  # simulate the best distrubition
+        self._select_paths()
+        self.assign_paths()
+        self.history.clear()
+        self.save_turn()
+        self.turns = self._simulate()
         print(f"Final turns: {self.turns}", file=sys.stderr)
         return self.turns
 
@@ -135,12 +122,11 @@ class Simulator:
         zone_occupancy = Counter(
             drone.current_zone for drone in drones if drone.transit_turns == 0
         )
-        zone_reservations = Counter()
-        link_usage = Counter()
+        zone_reservations: Counter[Zone] = Counter()
+        link_usage: Counter[Connection] = Counter()
         moved_this_turn = set()
         moves_this_turn = {}
 
-        # Phase 1:
         for drone in drones:
             if drone.transit_turns == 0:
                 continue
@@ -157,7 +143,6 @@ class Simulator:
             moved_this_turn.add(drone.id)
             moves_this_turn[drone.id] = f"{drone.name}-{next_zone.name}"
 
-        # Phase 2
         progress = True
         while progress:
             progress = False
@@ -221,9 +206,9 @@ class Simulator:
         guaranteed_next_turn = None
         while any(not drone.finished for drone in self.drones):
 
-            waiting = set()
-            planned = None
-            preview = None
+            waiting: set[int] = set()
+            planned: tuple[list[Drone], list[str]] | None = None
+            preview: tuple[list[Drone], list[str]] | None = None
             while True:
                 planned = self._plan_turn(self.drones, True, waiting)
                 preview = None
