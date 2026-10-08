@@ -4,6 +4,7 @@ import argparse
 
 from simulator import Simulator
 from parser import Parser
+from visualizer import Visualizer
 
 
 def main(filename: str = "map.txt", visual: bool = False) -> int:
@@ -19,6 +20,8 @@ def main(filename: str = "map.txt", visual: bool = False) -> int:
 
     simulation.run()
 
+    visualizer = Visualizer(data, simulation) 
+    visualizer.run()
 
 
 if __name__ == "__main__":
