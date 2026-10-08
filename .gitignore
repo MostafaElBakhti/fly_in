@@ -4,3 +4,5 @@ subject.pdf
 .DS_Store
 test.py
 git_auto.py
+.venv
+/fly/.venv
