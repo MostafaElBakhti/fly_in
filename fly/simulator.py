@@ -20,9 +20,7 @@ class Simulator:
             Drone(i + 1, map_data.start_hub, map_data.end_hub)
             for i in range(map_data.nb_drones)
         ]
-        # D1 D2 D3 D4 D5 D6 D7 D8 D9 D10
         self.history: list[dict[str, tuple[float, float]]] = []
-        # self.turns = 0
 
     def assign_paths(self) -> None:
         """Balance drones over routes using path cost and assigned count."""
@@ -64,7 +62,6 @@ class Simulator:
                 "No candidate route set can deliver all drones."
             )
         self.paths = best_paths
-        # self.assign_paths()
 
     def _validate_paths(self) -> None:
         start = self.map_data.start_hub

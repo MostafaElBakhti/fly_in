@@ -120,7 +120,7 @@ class Map:
         path.reverse()
         return path
 
-    def find_all_paths(self, max_paths=1):
+    def find_all_paths(self, max_paths=5):
         first_path = self.dijkstra()
         if first_path is None:
             return []
@@ -174,6 +174,5 @@ class Map:
 
             candidates.remove(best_path)
             paths.append(best_path)
-        for path in paths:
-            print([zone.name for zone in path])
+
         return paths
