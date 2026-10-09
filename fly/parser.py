@@ -52,9 +52,7 @@ class Parser:
 
     def valid_zone_name(self, name: str) -> bool:
 
-        return bool(name) and "-" not in name and not any(
-            char.isspace() for char in name
-        )
+        return bool(name) and "-" not in name
 
     def parse_zone(self, line: str, data: Map, zone_name: str) -> Zone:
         value = line.split(":", 1)[1].strip()

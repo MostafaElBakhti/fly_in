@@ -1,7 +1,0 @@
-D1-fast_junction D3-start-slow_path1
-D3-slow_path1 D1-fast_path D2-fast_junction
-D1-merge_point D2-fast_path D3-slow_path2 D4-fast_junction D5-start-slow_path1
-D5-slow_path1 D1-goal D2-merge_point D3-merge_point D4-fast_path
-D2-goal D3-goal D4-merge_point D5-slow_path2
-D4-goal D5-merge_point
-D5-goal
