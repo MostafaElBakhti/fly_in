@@ -43,6 +43,10 @@ class Simulator:
         """Compare schedules for each prefix of candidate routes."""
         if len(self.paths) <= 1:
             return
+        # print(len(self.paths))
+        # for path in self.paths:
+        #     print(["--".join(zone.name for zone in path)])
+        #     print()
         best_paths = None
         best_turns = float("inf")
         for count in range(1, len(self.paths) + 1):
