@@ -6,7 +6,6 @@ from map import Map
 class Parser:
 
     ZONE_TYPES = ["normal", "blocked", "restricted", "priority"]
-    # save_coordinate: list = []
 
     def parse_metadata(self, value: str) -> tuple[str, dict[str, str]]:
         if "[" not in value and "]" not in value:
@@ -60,7 +59,7 @@ class Parser:
 
         allowed_metadata = {"zone", "color", "max_drones"}
         for key in metadata_values:
-            if key.lower() not in allowed_metadata:
+            if key not in allowed_metadata:
                 raise ValueError(f"unknown zone metadata: {key}")
 
         parts = main.split()
@@ -78,10 +77,6 @@ class Parser:
             y = int(y_value)
         except ValueError:
             raise ValueError("zone coordinates must be integers")
-        # if (x, y) in self.save_coordinate:
-        #     raise ValueError("duplicated coordinates")
-        # self.save_coordinate.append((x, y))
-        # # print(self.save_coordinate)
         zone_type = metadata_values.get("zone", "normal").lower()
         if zone_type not in self.ZONE_TYPES:
             raise ValueError(f"invalid zone type: {zone_type}")
