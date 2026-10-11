@@ -1,6 +1,10 @@
 from map import Map
 from simulator import Simulator
-import pygame
+import os
+
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+
+import pygame  # noqa: E402
 
 
 class Visualizer:
@@ -64,17 +68,10 @@ class Visualizer:
         return int(screen_x), int(screen_y)
 
     def get_zone_color(self, zone):
-        color = zone.metadata.color
-
-        if not color:
-            return pygame.Color(200, 200, 200)
-
-        color = str(color).strip()
-
         try:
-            return pygame.Color(color)
+            return pygame.Color(zone.metadata.color)
         except ValueError:
-            return pygame.Color(200, 200, 200)
+            return pygame.Color("white")
 
     def draw_connections(self):
         drawn = set()
@@ -134,6 +131,7 @@ class Visualizer:
 
             if self.turn >= len(history) - 1:
                 self.progress = 0.0
+                self.running = False
                 break
 
     def draw_drones(self):

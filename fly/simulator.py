@@ -43,10 +43,6 @@ class Simulator:
         """Compare schedules for each prefix of candidate routes."""
         if len(self.paths) <= 1:
             return
-        # print(len(self.paths))
-        # for path in self.paths:
-        #     print(["--".join(zone.name for zone in path)])
-        #     print()
         best_paths = None
         best_turns = float("inf")
         for count in range(1, len(self.paths) + 1):
@@ -67,33 +63,33 @@ class Simulator:
             )
         self.paths = best_paths
 
-    def _validate_paths(self) -> None:
-        start = self.map_data.start_hub
-        end = self.map_data.end_hub
+    # def _validate_paths(self) -> None:
+    #     start = self.map_data.start_hub
+    #     end = self.map_data.end_hub
 
-        if start is None or end is None:
-            raise ValueError("The map must have a start hub and an end hub.")
-        if not self.paths:
-            sys.exit("Error: no valid path connects start_hub to end_hub.")
+    #     if start is None or end is None:
+    #         raise ValueError("The map must have a start hub and an end hub.")
+    #     if not self.paths:
+    #         sys.exit("Error: no valid path connects start_hub to end_hub.")
 
-        for path in self.paths:
-            if not path or path[0] is not start:
-                raise ValueError("A route must begin at the start hub.")
-            if path[-1] is not end:
-                raise ValueError("A route must finish at the end hub.")
+    #     for path in self.paths:
+    #         if not path or path[0] is not start:
+    #             raise ValueError("A route must begin at the start hub.")
+    #         if path[-1] is not end:
+    #             raise ValueError("A route must finish at the end hub.")
 
-            for source, destination in zip(path, path[1:]):
-                if destination.metadata.zone == "blocked":
-                    raise ValueError("A route enters a blocked zone.")
-                if destination not in source.neighbors:
-                    raise ValueError("A route uses a missing connection.")
+    #         for source, destination in zip(path, path[1:]):
+    #             if destination.metadata.zone == "blocked":
+    #                 raise ValueError("A route enters a blocked zone.")
+    #             if destination not in source.neighbors:
+    #                 raise ValueError("A route uses a missing connection.")
 
     def run(self) -> int:
         """Print only movement turns on stdout; return the total turn count."""
-        self._validate_paths()
+        # self._validate_paths()
         self._select_paths()
         self.assign_paths()
-        self.history.clear()
+        # self.history.clear()
         self.save_turn()
         self.turns = self._simulate()
         print(f"Final turns: {self.turns}", file=sys.stderr)
@@ -248,8 +244,23 @@ class Simulator:
                 drone.pending_connection = next_drone.pending_connection
             guaranteed_next_turn = preview
             if record_output:
-                print(" ".join(moves_this_turn))
                 self.save_turn()
+                zone = next(
+                    zone for zone in self.map_data.zone_by_name.values()
+                    if zone not in (self.map_data.start_hub, self.map_data.end_hub)
+                )
+
+                usage = sum(
+                    1 for drone in self.drones
+                    if drone.current_zone is zone
+                    and drone.transit_turns == 0
+                )
+
+                print(
+                    f"turn {turn} "
+                    f"Zone {zone.name}: "
+                    f"{usage}/{zone.metadata.max_drones} drones"
+                )
 
             turn += 1
         return turn - 1

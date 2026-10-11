@@ -4,7 +4,7 @@ intall:
 	python3 -m pip install pygame flake8 mypy
 
 run:
-	PYGAME_HIDE_SUPPORT_PROMPT=1 python3 main.py
+	python3 main.py
 
 debug:
 	python3 -m pdb main.py

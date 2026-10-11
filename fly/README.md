@@ -16,11 +16,7 @@ python3 main.py
 ```
 
 The entry point reads `map.txt`, prints the simulation, and opens the Pygame
-replay automatically. To use another map, call `main` with its filename:
-
-```sh
-python3 -c 'from main import main; main("maps/easy/01_linear_path.txt")'
-```
+replay automatically. The replay closes when the final turn is displayed.
 
 The Makefile also provides these commands:
 
@@ -102,10 +98,10 @@ Resize the window to fit the map, or use these controls:
 
 ## Example
 
-Save as `example.txt`, then run:
+Save the example as `map.txt`, then run:
 
 ```sh
-python3 -c 'from main import main; main("example.txt")'
+python3 main.py
 ```
 
 ```text
