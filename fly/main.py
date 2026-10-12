@@ -18,8 +18,8 @@ def main() -> int:
 
     simulation.run()
 
-    # visualizer = Visualizer(data, simulation)
-    # visualizer.run()
+    visualizer = Visualizer(data, simulation)
+    visualizer.run()
     return 0
 
 

@@ -8,7 +8,10 @@ import pygame  # noqa: E402
 
 
 class Visualizer:
+    """Display the map and replay recorded drone movements."""
+
     def __init__(self, map_data: Map, simulation: Simulator):
+        """Set up the replay window for map_data and simulation."""
         pygame.init()
 
         self.map = map_data
@@ -62,18 +65,21 @@ class Visualizer:
         self.show_labels = self.zone_radius >= 8
 
     def map_to_screen(self, x, y):
+        """Return screen pixel coordinates for map coordinates x and y."""
         screen_x = (x - self.min_x) * self.scale + self.offset_x
         screen_y = (y - self.min_y) * self.scale + self.offset_y
 
         return int(screen_x), int(screen_y)
 
     def get_zone_color(self, zone):
+        """Return the zone's display color, using white if it is invalid."""
         try:
             return pygame.Color(zone.metadata.color)
         except ValueError:
             return pygame.Color("white")
 
     def draw_connections(self):
+        """Draw each connection once as a line between its zones."""
         drawn = set()
 
         for zone in self.map.zone_by_name.values():
@@ -97,6 +103,7 @@ class Visualizer:
                 )
 
     def draw_zones(self):
+        """Draw colored zones and show their names when space allows."""
         for zone in self.map.zone_by_name.values():
             x, y = self.map_to_screen(zone.x, zone.y)
 
@@ -169,6 +176,7 @@ class Visualizer:
             )
 
     def run(self):
+        """Play the simulation and handle window and keyboard events."""
         paused = False
 
         while self.running:

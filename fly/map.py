@@ -2,6 +2,7 @@ class Map:
     """Holds the zone/connection graph and finds paths through it."""
 
     def __init__(self):
+        """Create an empty map with no drones, zones, or connections."""
         self.nb_drones = 0
         self.start_hub = None
         self.end_hub = None
@@ -10,6 +11,7 @@ class Map:
         self.zone_by_name = {}
 
     def build_neighbors(self):
+        """Add each connection to both zones' neighbor dictionaries."""
         for connection in self.connections:
             zone_a = connection.zone_a
             zone_b = connection.zone_b
@@ -18,12 +20,14 @@ class Map:
             zone_b.neighbors[zone_a] = connection
 
     def path_cost(self, path):
+        """Return the total movement cost of the given path in turns."""
         cost = 0
         for zone in path[1:]:
             cost += 2 if zone.metadata.zone == "restricted" else 1
         return cost
 
     def path_priority(self, path):
+        """Return the number of priority zones in the given path."""
         score = 0
         for zone in path:
             if zone.metadata.zone == "priority":
@@ -37,6 +41,7 @@ class Map:
         forbidden_connections=None,
         forbidden_nodes=None,
     ):
+        """Return a cheapest allowed start-to-end path, or None if absent."""
         if start is None:
             start = self.start_hub
         if end is None:
@@ -121,6 +126,7 @@ class Map:
         return path
 
     def find_all_paths(self, max_paths=5):
+        """Return up to max_paths routes, ordered by cost and priority."""
         first_path = self.dijkstra()
         if first_path is None:
             return []

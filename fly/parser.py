@@ -4,10 +4,12 @@ from map import Map
 
 
 class Parser:
+    """Read map files and validate their definitions."""
 
     ZONE_TYPES = ["normal", "blocked", "restricted", "priority"]
 
     def parse_metadata(self, value: str) -> tuple[str, dict[str, str]]:
+        """Split a value into its main text and metadata dictionary."""
         if "[" not in value and "]" not in value:
             return value.strip(), {}
 
@@ -36,6 +38,7 @@ class Parser:
         return main, metadata
 
     def positive_integer(self, value: str, field_name: str) -> int:
+        """Convert value to a positive integer or raise a named field error."""
         if "_" in value:
             raise ValueError(f"{field_name} must be a positive integer")
         try:
@@ -50,10 +53,11 @@ class Parser:
         return number
 
     def valid_zone_name(self, name: str) -> bool:
-
+        """Return whether name is nonempty and contains no dash."""
         return bool(name) and "-" not in name
 
     def parse_zone(self, line: str, data: Map, zone_name: str) -> Zone:
+        """Parse a hub line, register its zone in data, and return it."""
         value = line.split(":", 1)[1].strip()
         main, metadata_values = self.parse_metadata(value)
 
@@ -97,6 +101,7 @@ class Parser:
         return zone
 
     def parse_connection(self, line: str, data: Map) -> Connection:
+        """Parse a link between zones in data and return the connection."""
         value = line.split(":", 1)[1].strip()
         main, metadata_values = self.parse_metadata(value)
 
@@ -143,6 +148,7 @@ class Parser:
         return Connection(zone_a, zone_b, max_link_capacity)
 
     def parse_map_file(self, filename: str) -> Map:
+        """Return the map read from filename, or exit with an input error."""
         data = Map()
         found_nb_drones = False
         found_start = False
