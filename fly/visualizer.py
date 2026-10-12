@@ -1,3 +1,4 @@
+from classes import Zone
 from map import Map
 from simulator import Simulator
 import os
@@ -10,7 +11,7 @@ import pygame  # noqa: E402
 class Visualizer:
     """Display the map and replay recorded drone movements."""
 
-    def __init__(self, map_data: Map, simulation: Simulator):
+    def __init__(self, map_data: Map, simulation: Simulator) -> None:
         """Set up the replay window for map_data and simulation."""
         pygame.init()
 
@@ -26,8 +27,10 @@ class Visualizer:
 
         self.running = True
         self.progress = 0.0
-        self.speed = 2
+        self.speed = 0.5
         self.turn = 0
+        self.paused = True
+        self.continuous = False
         self.clock = pygame.time.Clock()
 
         zones = list(self.map.zone_by_name.values())
@@ -43,7 +46,7 @@ class Visualizer:
         self.margin = 60
         self.update_layout()
 
-    def update_layout(self):
+    def update_layout(self) -> None:
         """Recompute scale and sizes from the current window size."""
         self.width, self.height = self.screen.get_size()
 
@@ -64,21 +67,21 @@ class Visualizer:
         self.font = pygame.font.Font(None, self.font_size)
         self.show_labels = self.zone_radius >= 8
 
-    def map_to_screen(self, x, y):
+    def map_to_screen(self, x: float, y: float) -> tuple[int, int]:
         """Return screen pixel coordinates for map coordinates x and y."""
         screen_x = (x - self.min_x) * self.scale + self.offset_x
         screen_y = (y - self.min_y) * self.scale + self.offset_y
 
         return int(screen_x), int(screen_y)
 
-    def get_zone_color(self, zone):
+    def get_zone_color(self, zone: Zone) -> pygame.Color:
         """Return the zone's display color, using white if it is invalid."""
         try:
             return pygame.Color(zone.metadata.color)
         except ValueError:
             return pygame.Color("white")
 
-    def draw_connections(self):
+    def draw_connections(self) -> None:
         """Draw each connection once as a line between its zones."""
         drawn = set()
 
@@ -102,7 +105,7 @@ class Visualizer:
                     self.line_width
                 )
 
-    def draw_zones(self):
+    def draw_zones(self) -> None:
         """Draw colored zones and show their names when space allows."""
         for zone in self.map.zone_by_name.values():
             x, y = self.map_to_screen(zone.x, zone.y)
@@ -123,7 +126,7 @@ class Visualizer:
             )
             self.screen.blit(text, text_rect)
 
-    def update_animation(self, dt):
+    def update_animation(self, dt: float) -> None:
         """Advance playback using elapsed time in seconds."""
         history = self.simulation.history
 
@@ -137,11 +140,12 @@ class Visualizer:
             self.turn += 1
 
             if self.turn >= len(history) - 1:
-                self.progress = 0.0
-                self.running = False
-                break
+                self.paused = True
+                self.continuous = False
+            elif not self.continuous:
+                self.paused = True
 
-    def draw_drones(self):
+    def draw_drones(self) -> None:
         """Draw drones between the current and next saved positions."""
         history = self.simulation.history
 
@@ -175,7 +179,7 @@ class Visualizer:
                 1
             )
 
-    def run(self):
+    def run(self) -> None:
         """Play the simulation and handle window and keyboard events."""
         paused = False
 

@@ -1,16 +1,19 @@
+from classes import Connection, Zone
+
+
 class Map:
     """Holds the zone/connection graph and finds paths through it."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Create an empty map with no drones, zones, or connections."""
         self.nb_drones = 0
-        self.start_hub = None
-        self.end_hub = None
-        self.zones = []
-        self.connections = []
-        self.zone_by_name = {}
+        self.start_hub: Zone | None = None
+        self.end_hub: Zone | None = None
+        self.zones: list[Zone] = []
+        self.connections: list[Connection] = []
+        self.zone_by_name: dict[str, Zone] = {}
 
-    def build_neighbors(self):
+    def build_neighbors(self) -> None:
         """Add each connection to both zones' neighbor dictionaries."""
         for connection in self.connections:
             zone_a = connection.zone_a
@@ -19,14 +22,14 @@ class Map:
             zone_a.neighbors[zone_b] = connection
             zone_b.neighbors[zone_a] = connection
 
-    def path_cost(self, path):
+    def path_cost(self, path: list[Zone]) -> int:
         """Return the total movement cost of the given path in turns."""
         cost = 0
         for zone in path[1:]:
             cost += 2 if zone.metadata.zone == "restricted" else 1
         return cost
 
-    def path_priority(self, path):
+    def path_priority(self, path: list[Zone]) -> int:
         """Return the number of priority zones in the given path."""
         score = 0
         for zone in path:
@@ -36,23 +39,25 @@ class Map:
 
     def dijkstra(
         self,
-        start=None,
-        end=None,
-        forbidden_connections=None,
-        forbidden_nodes=None,
-    ):
+        start: Zone | None = None,
+        end: Zone | None = None,
+        forbidden_connections: set[Connection] | None = None,
+        forbidden_nodes: set[Zone] | None = None,
+    ) -> list[Zone] | None:
         """Return a cheapest allowed start-to-end path, or None if absent."""
         if start is None:
             start = self.start_hub
         if end is None:
             end = self.end_hub
+        if start is None or end is None:
+            raise ValueError("The map must have a start hub and an end hub.")
 
         forbidden_connections = forbidden_connections or set()
         forbidden_nodes = forbidden_nodes or set()
 
-        distances = {}
-        previous = {}
-        priority_score = {}
+        distances: dict[Zone, float] = {}
+        previous: dict[Zone, Zone | None] = {}
+        priority_score: dict[Zone, int] = {}
 
         for zone in self.zone_by_name.values():
             distances[zone] = float("inf")
@@ -117,15 +122,15 @@ class Map:
             return None
 
         path = []
-        current = end
-        while current is not None:
-            path.append(current)
-            current = previous[current]
+        node: Zone | None = end
+        while node is not None:
+            path.append(node)
+            node = previous[node]
 
         path.reverse()
         return path
 
-    def find_all_paths(self, max_paths=5):
+    def find_all_paths(self, max_paths: int = 5) -> list[list[Zone]]:
         """Return up to max_paths routes, ordered by cost and priority."""
         first_path = self.dijkstra()
         if first_path is None:

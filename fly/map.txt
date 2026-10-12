@@ -1,33 +1,18 @@
-nb_drones: 10
+# Medium Level 3: Priority zones create optimal path challenges
+nb_drones: 5
 
-start_hub: START 0 5 [color=green]
-end_hub: END 15 5 [color=yellow]
+start_hub: start 0 0 [color=green]
+hub: slow_path1 1 -1 [zone=restricted color=red]
+hub: slow_path2 2 -1 [color=red]
+hub: fast_junction 1 0 [zone=priority color=blue max_drones=2]
+hub: fast_path 2 0 [zone=priority color=blue]
+hub: merge_point 3 0 [color=yellow max_drones=3]
+end_hub: goal 4 0 [color=green]
 
-hub: A 3 2 [zone=normal max_drones=2]
-hub: B 3 8 [zone=priority color=cyan max_drones=2]
-
-hub: C 6 1 [zone=restricted color=orange max_drones=1]
-hub: D 6 5 [zone=normal color=blue max_drones=2]
-hub: E 6 9 [zone=priority color=cyan max_drones=1]
-
-hub: F 10 2 [zone=normal color=blue max_drones=2]
-hub: G 10 6 [zone=restricted color=orange max_drones=1]
-hub: H 10 10 [zone=blocked color=red max_drones=1]
-
-connection: START-A [max_link_capacity=2]
-connection: START-B [max_link_capacity=2]
-
-connection: A-C [max_link_capacity=1]
-connection: A-D [max_link_capacity=2]
-connection: B-D [max_link_capacity=1]
-connection: B-E [max_link_capacity=2]
-
-connection: C-F [max_link_capacity=1]
-connection: D-F [max_link_capacity=1]
-connection: D-G [max_link_capacity=2]
-connection: E-G [max_link_capacity=1]
-connection: E-H [max_link_capacity=1]
-
-connection: F-END [max_link_capacity=2]
-connection: G-END [max_link_capacity=1]
-connection: H-END [max_link_capacity=1]
+connection: start-slow_path1
+connection: start-fast_junction
+connection: slow_path1-slow_path2
+connection: slow_path2-merge_point
+connection: fast_junction-fast_path
+connection: fast_path-merge_point
+connection: merge_point-goal [max_link_capacity=2]

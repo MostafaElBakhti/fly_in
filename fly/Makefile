@@ -1,6 +1,6 @@
 .PHONY: install run debug clean lint lint-strict
 
-intall:
+install:
 	python3 -m pip install pygame flake8 mypy
 
 run:

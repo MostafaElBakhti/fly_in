@@ -16,7 +16,8 @@ python3 main.py
 ```
 
 The entry point reads `map.txt`, prints the simulation, and opens the Pygame
-replay automatically. The replay closes when the final turn is displayed.
+replay automatically. The final turn remains displayed until the window is
+closed.
 
 The Makefile also provides these commands:
 
@@ -85,11 +86,11 @@ PY
 
 `python3 main.py` opens the Pygame replay after the simulation completes.
 It draws connections and colored zones at their map coordinates, with zone names
-when there is enough space. Unknown color words fall back to gray.
+when there is enough space. Unknown color words fall back to white.
 
 Orange circles show drone positions and move smoothly between the saved turns.
 Restricted moves pass through the connection's midpoint. Drones at the same
-position overlap. Playback starts automatically at two turns per second.
+position overlap. Playback starts automatically at one turn per second.
 Resize the window to fit the map, or use these controls:
 
 - **Space:** pause or resume playback.
@@ -122,8 +123,7 @@ D2-end
 ```
 
 Each line is one turn; waiting drones are omitted. The total is printed to stderr
-as `Final turns: 3`. Route lists are also printed before the movement lines by
-`find_all_paths()`.
+as `Final turns: 3`.
 
 ## Resources
 
