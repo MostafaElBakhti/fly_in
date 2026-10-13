@@ -85,16 +85,20 @@ PY
 ## Visualization
 
 `python3 main.py` opens the Pygame replay after the simulation completes.
-It draws connections and colored zones at their map coordinates, with zone names
-when there is enough space. Unknown color words fall back to white.
+It presents the route as a responsive mission-control dashboard with zone-type
+rings, connection-capacity badges, mission statistics, a turn timeline, and
+hover details for each zone. Unknown color words use a neutral fallback color.
 
-Orange circles show drone positions and move smoothly between the saved turns.
-Restricted moves pass through the connection's midpoint. Drones at the same
-position overlap. Playback starts automatically at one turn per second.
-Resize the window to fit the map, or use these controls:
+Numbered, color-coded drone markers move smoothly between saved turns.
+Restricted moves pass through the connection's midpoint, and drones sharing a
+position fan out so each remains visible. Playback starts automatically at one
+turn per second. Resize the window freely, use the on-screen controls, or use
+these shortcuts:
 
 - **Space:** pause or resume playback.
-- **R:** reset to turn zero, keeping the current pause state.
+- **Left / Right:** step backward or forward by one recorded turn.
+- **R:** return to turn zero and pause.
+- **+ / -:** increase or decrease playback speed.
 - **Close the window:** exit the replay.
 
 ## Example
